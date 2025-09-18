@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/normalize.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&display=swap" rel="stylesheet">
+    <title>Document</title>
+</head>
+<body>
+    <header class="header">
+        <div class="header__search">
+            <input type="text" id="stockSymbol" placeholder="Введите тикер или компанию...">
+            <button onclick="fetchStockData()">123</button>
+        </div>
+    </header>
+    <main  class="main">
+        <div class="container">
+            <h1 id="symbolShow">Акции такой-то компании</h1>
+            <hr>
+            <div class="main__table">
+                <div class="table__row" id="row">
+                    <div class="table__index">
+                        индекс
+                    </div>
+                    <div class="table__name">
+                        название
+                    </div>
+                    <div class="table__price">
+                        цена
+                    </div>
+                    <div class="table__pricediff">
+                        изменение цены
+                    </div>
+                    <div class="table__volume">
+                        объем продаж
+                    </div>
+                </div>
+                <div class="table__row" id="row">
+                    <div class="table__index">
+                        индекс
+                    </div>
+                    <div class="table__name">
+                        название
+                    </div>
+                    <div class="table__price">
+                        цена
+                    </div>
+                    <div class="table__pricediff">
+                        изменение цены
+                    </div>
+                    <div class="table__volume">
+                        объем продаж
+                    </div>
+                </div>
+                <div class="table__row" id="row">
+                    <div class="table__index">
+                        индекс
+                    </div>
+                    <div class="table__name">
+                        название
+                    </div>
+                    <div class="table__price">
+                        цена
+                    </div>
+                    <div class="table__pricediff">
+                        изменение цены
+                    </div>
+                    <div class="table__volume">
+                        объем продаж
+                    </div>
+                </div>
+                <div class="table__row" id="row">
+                    <div class="table__index">
+                        индекс
+                    </div>
+                    <div class="table__name">
+                        название
+                    </div>
+                    <div class="table__price">
+                        цена
+                    </div>
+                    <div class="table__pricediff">
+                        изменение цены
+                    </div>
+                    <div class="table__volume">
+                        объем продаж
+                    </div>
+                </div>
+                <div class="table__row" id="row">
+                    <div class="table__index">
+                        индекс
+                    </div>
+                    <div class="table__name">
+                        название
+                    </div>
+                    <div class="table__price">
+                        цена
+                    </div>
+                    <div class="table__pricediff">
+                        изменение цены
+                    </div>
+                    <div class="table__volume">
+                        объем продаж
+                    </div>
+                </div>
+                <div class="table__row" id="row">
+                    <div class="table__index">
+                        индекс
+                    </div>
+                    <div class="table__name">
+                        название
+                    </div>
+                    <div class="table__price">
+                        цена
+                    </div>
+                    <div class="table__pricediff">
+                        изменение цены
+                    </div>
+                    <div class="table__volume">
+                        объем продаж
+                    </div>
+                </div> 
+            </div>
+        </div>
+        <div id="stockData"></div>
+    </main>
+    <div class="details">
+        <div class="details__close">
+                X
+        </div>
+    </div>
+    <script src="app.js"></script>
+</body>
+</html>
