@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!DOCTYPE html5>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -14,7 +14,7 @@
     <header class="header">
         <div class="header__search">
             <input type="text" id="stockSymbol" placeholder="Введите тикер или компанию...">
-            <button onclick="fetchStockData()">123</button>
+            <button onclick="fetchStockData()">Найти</button>
         </div>
     </header>
     <main  class="main">
@@ -24,27 +24,10 @@
             <div class="main__table">
                 <div class="table__row" id="row">
                     <div class="table__index">
-                        индекс
+                        APPL
                     </div>
-                    <div class="table__name">
-                        название
-                    </div>
-                    <div class="table__price">
-                        цена
-                    </div>
-                    <div class="table__pricediff">
-                        изменение цены
-                    </div>
-                    <div class="table__volume">
-                        объем продаж
-                    </div>
-                </div>
-                <div class="table__row" id="row">
-                    <div class="table__index">
-                        индекс
-                    </div>
-                    <div class="table__name">
-                        название
+                    <div class="table__name" id="stockName">
+                        Apple
                     </div>
                     <div class="table__price">
                         цена
@@ -58,10 +41,10 @@
                 </div>
                 <div class="table__row" id="row">
                     <div class="table__index">
-                        индекс
+                        NVDA
                     </div>
-                    <div class="table__name">
-                        название
+                    <div class="table__name" >
+                        Nvidia Corporation
                     </div>
                     <div class="table__price">
                         цена
@@ -75,10 +58,27 @@
                 </div>
                 <div class="table__row" id="row">
                     <div class="table__index">
-                        индекс
+                        MSFT
                     </div>
                     <div class="table__name">
-                        название
+                        Microsoft Corporation
+                    </div>
+                    <div class="table__price">
+                        цена
+                    </div>
+                    <div class="table__pricediff">
+                        изменение цены
+                    </div>
+                    <div class="table__volume">
+                        объем продаж
+                    </div>
+                </div>
+                <div class="table__row" id="row">
+                    <div class="table__index">
+                        GOOGL
+                    </div>
+                    <div class="table__name">
+                        Alphbet Inc.
                     </div>
                     <div class="table__price">
                         цена
@@ -131,6 +131,21 @@
     <div class="details">
         <div class="details__close">
                 X
+        </div>
+        <div class="detils__statistics">
+            <h1>Подробная статистика</h1>
+        </div>
+        <div class="details__news">
+            <h1>Новости</h1>
+            <div class="details__news-title" id="newsTitle">
+                Заголовк новости
+            </div>
+            <div class="details__news-desc" id="newsDesc">
+                Описание нвовости
+            </div>
+            <div class="details__news-date">
+                Дата публикации
+            </div>
         </div>
     </div>
     <script src="app.js"></script>
