@@ -26,7 +26,7 @@
                     <div class="table__index">
                         APPL
                     </div>
-                    <div class="table__name" id="stockName">
+                    <div class="table__name" id="stockName" >
                         Apple
                     </div>
                     <div class="table__price">
@@ -43,7 +43,7 @@
                     <div class="table__index">
                         NVDA
                     </div>
-                    <div class="table__name" >
+                    <div class="table__name" id="stockName">
                         Nvidia Corporation
                     </div>
                     <div class="table__price">
@@ -60,7 +60,7 @@
                     <div class="table__index">
                         MSFT
                     </div>
-                    <div class="table__name">
+                    <div class="table__name" id="stockName">
                         Microsoft Corporation
                     </div>
                     <div class="table__price">
@@ -90,45 +90,11 @@
                         объем продаж
                     </div>
                 </div>
-                <div class="table__row" id="row">
-                    <div class="table__index">
-                        индекс
-                    </div>
-                    <div class="table__name">
-                        название
-                    </div>
-                    <div class="table__price">
-                        цена
-                    </div>
-                    <div class="table__pricediff">
-                        изменение цены
-                    </div>
-                    <div class="table__volume">
-                        объем продаж
-                    </div>
-                </div>
-                <div class="table__row" id="row">
-                    <div class="table__index">
-                        индекс
-                    </div>
-                    <div class="table__name">
-                        название
-                    </div>
-                    <div class="table__price">
-                        цена
-                    </div>
-                    <div class="table__pricediff">
-                        изменение цены
-                    </div>
-                    <div class="table__volume">
-                        объем продаж
-                    </div>
-                </div> 
             </div>
         </div>
         <div id="stockData"></div>
     </main>
-    <div class="details">
+    <div class="details" id="details">
         <div class="details__close">
                 X
         </div>
@@ -137,14 +103,8 @@
         </div>
         <div class="details__news">
             <h1>Новости</h1>
-            <div class="details__news-title" id="newsTitle">
-                Заголовк новости
-            </div>
-            <div class="details__news-desc" id="newsDesc">
-                Описание нвовости
-            </div>
-            <div class="details__news-date">
-                Дата публикации
+            <div id="newsWrapper">
+                
             </div>
         </div>
     </div>
