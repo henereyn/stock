@@ -6,12 +6,37 @@ body
 }
 .header
 {
+    z-index: 0;
     background: rgb(255, 255, 255);
     width: 100%;
-    height: 50px;
+    flex-direction: column;
+    display: flex;
+    
+    text-align: center;
+}
+.header__title
+{
+    font-weight: 700;
+    font-size: 48px;
+    padding: 20px 0 40px 0;
+}
+.header__search
+{
     display: flex;
     justify-content: center;
     align-items: center;
+    column-gap: 10px;
+    margin:0 0 10px 0;
+    height: 50px;
+}
+.header__search input
+{
+    height: 30px;
+    width: 350px;
+}
+.header__search img
+{
+    cursor: pointer;
 }
 .container
 {
@@ -19,19 +44,43 @@ body
 }
 .main
 {
-    margin: 5px 0 0 0;
+    z-index: 0;
+    margin: 30px 0 0 0;
     background: rgb(255, 255, 255);
 }
+.main__title
+{
+    padding: 20px 0 0 0;
+    font-size: 36px;
+    font-weight: 600;
+    align-content: center;
+}
+.main__title img
+{
+    width: 90px;
+}
+.main__title p
+{
+    font-size: 20px;
+    font-weight: 400;
+}
+
 .main__table
 {
+    font-size: 22px;
     display: flex;
     width: 100%;
     flex-direction: column;
+    padding-bottom: 50px;
     
+}
+.table__titles
+{
+    background: rgb(190, 190, 190);
 }
 .table__row
 {
-    margin: 10px 0 0 0;
+    margin: 20px 0 0 0;
     display: grid;
     grid-auto-flow: column;
     grid-template-columns: 10% 40% 15% 20% 15%;
@@ -42,8 +91,10 @@ body
 {
     border: 1px solid rgb(190, 190, 190);
 }
+
 .details
 {
+    z-index: 2;
     display: none;
     position: absolute;
     top: 0;
@@ -55,7 +106,39 @@ body
 .details__close
 {
     position: absolute;
-    top: 10px;
-    right: 10px;
+    top: 20px;
+    right: 20px;
     cursor: pointer;
+}
+#newsWrapper
+{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+.news__card
+{
+    width: 300px;
+    border: 1px solid rgba(179, 179, 179, 0.5);
+    border-radius: 5px;
+    padding: 5px;
+    
+}
+.news__card-title
+{
+    font-weight: 600;
+    margin: 0 0 10px 0;
+    color: black;
+}
+.overlay
+{
+    z-index: 1;
+    display: none;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: black;
+    opacity: 0.3;
 }

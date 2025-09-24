@@ -12,18 +12,43 @@
 </head>
 <body>
     <header class="header">
+        <div class="header__title">
+            Stock Tracker
+        </div>
         <div class="header__search">
-            <input type="text" id="stockSymbol" placeholder="Введите тикер или компанию...">
-            <button onclick="fetchStockData()">Найти</button>
+            <input type="text" placeholder="Введите тикер или название компании...">
+            <img src="img/Search.svg" alt="searchico">
         </div>
     </header>
     <main  class="main">
         <div class="container">
-            <h1 id="symbolShow">Акции такой-то компании</h1>
+            <div class="main__title">
+                <img src="img/s-and-p-500--600.png" alt="sp500">
+                S&P500
+                <p>Cписок крупнейших 500 акций по индексу S&P500(SPX)</p>
+            </div>
+            
             <hr>
             <div class="main__table">
-                <div class="table__row" id="row">
+                <div class="table__row table__titles" id="row">
                     <div class="table__index">
+                        Тикер
+                    </div>
+                    <div class="table__name" >
+                        Компания
+                    </div>
+                    <div class="table__price">
+                        Цена акции
+                    </div>
+                    <div class="table__pricediff">
+                        Изменение цены
+                    </div>
+                    <div class="table__volume">
+                        Объем продаж
+                    </div>
+                </div>
+                <div class="table__row" id="row">
+                    <div class="table__index" id="stockSymbol">
                         APPL
                     </div>
                     <div class="table__name" id="stockName" >
@@ -90,21 +115,97 @@
                         объем продаж
                     </div>
                 </div>
+                <div class="table__row" id="row">
+                    <div class="table__index">
+                        GOOGL
+                    </div>
+                    <div class="table__name">
+                        Alphbet Inc.
+                    </div>
+                    <div class="table__price">
+                        цена
+                    </div>
+                    <div class="table__pricediff">
+                        изменение цены
+                    </div>
+                    <div class="table__volume">
+                        объем продаж
+                    </div>
+                </div>
+                <div class="table__row" id="row">
+                    <div class="table__index">
+                        GOOGL
+                    </div>
+                    <div class="table__name">
+                        Alphbet Inc.
+                    </div>
+                    <div class="table__price">
+                        цена
+                    </div>
+                    <div class="table__pricediff">
+                        изменение цены
+                    </div>
+                    <div class="table__volume">
+                        объем продаж
+                    </div>
+                </div>
+                <div class="table__row" id="row">
+                    <div class="table__index">
+                        GOOGL
+                    </div>
+                    <div class="table__name">
+                        Alphbet Inc.
+                    </div>
+                    <div class="table__price">
+                        цена
+                    </div>
+                    <div class="table__pricediff">
+                        изменение цены
+                    </div>
+                    <div class="table__volume">
+                        объем продаж
+                    </div>
+                </div>
+                <div class="table__row" id="row">
+                    <div class="table__index">
+                        GOOGL
+                    </div>
+                    <div class="table__name">
+                        Alphbet Inc.
+                    </div>
+                    <div class="table__price">
+                        цена
+                    </div>
+                    <div class="table__pricediff">
+                        изменение цены
+                    </div>
+                    <div class="table__volume">
+                        объем продаж
+                    </div>
+                </div>
             </div>
         </div>
-        <div id="stockData"></div>
+        <div class="overlay" id="overlay"></div>
     </main>
     <div class="details" id="details">
-        <div class="details__close">
+        <div class="container">
+            <div class="details__close">
                 X
-        </div>
-        <div class="detils__statistics">
-            <h1>Подробная статистика</h1>
-        </div>
-        <div class="details__news">
-            <h1>Новости</h1>
-            <div id="newsWrapper">
-                
+            </div>
+            <div class="detils__statistics">
+                <h1>Подробная статистика</h1>
+                <div id="price"></div>
+                <div id="change"></div>
+                <div id="open"></div>
+                <div id="high"></div>
+                <div id="low"></div>
+                <div id="volume"></div>
+            </div>
+            <div class="details__news">
+                <h1>Новости</h1>
+                <div id="newsWrapper">
+                    
+                </div>
             </div>
         </div>
     </div>
