@@ -49,18 +49,18 @@
                 </div>
                 <div class="table__row" id="row">
                     <div class="table__index" id="stockSymbol">
-                        APPL
+                        1
                     </div>
                     <div class="table__name" id="stockName" >
-                        Apple
+                        1
                     </div>
-                    <div class="table__price">
+                    <div class="table__price" id="stockPrice">
                         цена
                     </div>
-                    <div class="table__pricediff">
+                    <div class="table__pricediff" id="stockChange">
                         изменение цены
                     </div>
-                    <div class="table__volume">
+                    <div class="table__volume" id="stockVolume">
                         объем продаж
                     </div>
                 </div>
@@ -201,6 +201,9 @@
                 <div id="low"></div>
                 <div id="volume"></div>
             </div>
+            <div>
+                <canvas id="myChart"></canvas>
+            </div>
             <div class="details__news">
                 <h1>Новости</h1>
                 <div id="newsWrapper">
@@ -210,5 +213,6 @@
         </div>
     </div>
     <script src="app.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </body>
 </html>
