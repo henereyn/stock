@@ -110,6 +110,29 @@ body
     right: 20px;
     cursor: pointer;
 }
+.details__symbol
+{
+    font-size: 32px;
+}
+.details__statistics
+{
+    font-size: 24px;
+    display: flex;
+    column-gap: 400px;
+    margin: 40px 0 0 0;
+    flex-wrap: wrap;
+}
+.det__flex
+{
+    margin: 0 0 15px 0;
+}
+.chart__alter
+{
+    margin: 15px 0 0 0;
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+}
 #newsWrapper
 {
     display: flex;

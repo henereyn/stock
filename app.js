@@ -21,6 +21,7 @@ async function fetchSymbolkData() {
     const globalQuoteResponse = await fetch(globalQuotekUrl);
     const globalQuoteData = await globalQuoteResponse.json();
     const globalQuote = globalQuoteData["Global Quote"];
+    document.getElementById("price").innerText = globalQuote["01. symbol"]
     document.getElementById("price").innerText = globalQuote["05. price"]
     document.getElementById("change").innerText = globalQuote["09. change"]
     document.getElementById("open").innerText = globalQuote["02. open"]
@@ -37,15 +38,16 @@ async function fetchSymbolkData() {
     // console.log(stockData)
 // }
 async function stockChartDay() {
-    const chartUrl = `https://www.alphavantage.co/query?function=TIME_SERIES_INTERDAY&symbol=IBM&interval=60minapikey=${avKey}`;
+    const chartUrl = `https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol=IBM&interval=60min&apikey=${avKey}`;
     const chartUrlResponse = await fetch(chartUrl);
     const chartData = await chartUrlResponse.json();
-    // const chart = chartData["Time Series (60min)"];
+    const chart = chartData["Time Series (60min)"];
     // var today = new Date();
     // var dd = String(today.getDate()-1).padStart(2, '0');
     // var mm = String(today.getMonth() + 1).padStart(2, '0');
     // var yyyy = today.getFullYear();
     // today = yyyy + '-' + mm + '-' + dd;
+
     const chartDataset = Object.values(chart).map(c => c["4. close"]).toReversed()
     const ctx = document.getElementById('myChart');
     new Chart(ctx, {
@@ -53,8 +55,8 @@ async function stockChartDay() {
         data: {
         labels: [],
         datasets: [{
-            label: '',
-            data: chartDataset,
+            label: '123',
+            data: [chartDataset],
             borderWidth: 1
         }]
         },
@@ -103,6 +105,7 @@ function openDetails(){
     overlay.style.display = 'block';
     fetchSymbolkData()
     fetchNewsData();
+    stockChartDay();
 }
 // document.querySelector('.table__row').addEventListener('click',function()
 //     {

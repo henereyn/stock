@@ -192,17 +192,29 @@
             <div class="details__close">
                 X
             </div>
-            <div class="detils__statistics">
-                <h1>Подробная статистика</h1>
-                <div id="price"></div>
-                <div id="change"></div>
-                <div id="open"></div>
-                <div id="high"></div>
-                <div id="low"></div>
-                <div id="volume"></div>
+            <h1>Подробная статистика</h1>
+            <div class="details__symbol" id="symbol">Тикер</div>
+            <div class="details__statistics">
+                <div>
+                    <div class="details__statistics-price det__flex" id="price">Цена</div>
+                    <div class="details__statistics-change det__flex" id="change">Изменение цены</div>
+                    <div class="details__statistics-volume det__flex"id="volume">Volume</div>
+                </div>
+                <div>
+                    
+                    <div class="details__statistics-open det__flex" id="open">Open</div>
+                    <div class="details__statistics-high det__flex"id="high">High</div>
+                    <div class="details__statistics-low det__flex" id="low">Low</div>
+                </div>
             </div>
             <div>
                 <canvas id="myChart"></canvas>
+                <div class="chart__alter">
+                    <div class="chart__alter-button" id="chartDay">День</div>
+                    <div class="chart__alter-button" id="chartWeek">Неделя</div>
+                    <div class="chart__alter-button" id="chartMonth">Месяц</div>
+                    <div class="chart__alter-button" id="chartYear">Год</div>
+                </div>
             </div>
             <div class="details__news">
                 <h1>Новости</h1>
