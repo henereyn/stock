@@ -193,7 +193,7 @@
                 X
             </div>
             <h1>Подробная статистика</h1>
-            <div class="details__symbol" id="symbol">Тикер</div>
+            <div class="details__symbol" id="symbol"></div>
             <div class="details__statistics">
                 <div>
                     <div class="details__statistics-price det__flex" id="price">Цена</div>
@@ -210,10 +210,10 @@
             <div>
                 <canvas id="myChart"></canvas>
                 <div class="chart__alter">
-                    <div class="chart__alter-button" id="chartDay">День</div>
-                    <div class="chart__alter-button" id="chartWeek">Неделя</div>
-                    <div class="chart__alter-button" id="chartMonth">Месяц</div>
-                    <div class="chart__alter-button" id="chartYear">Год</div>
+                    <div class="chart__alter-button" id="chartDay" onclick="stockChartDay()">День</div>
+                    <div class="chart__alter-button" id="chartWeek" onclick="stockChartWeek()">Неделя</div>
+                    <div class="chart__alter-button" id="chartMonth" onclick="stockChartMonth()">Месяц</div>
+                    <div class="chart__alter-button" id="chartYear" onclick="stockChartYear()">Год</div>
                 </div>
             </div>
             <div class="details__news">

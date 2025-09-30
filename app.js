@@ -21,7 +21,7 @@ async function fetchSymbolkData() {
     const globalQuoteResponse = await fetch(globalQuotekUrl);
     const globalQuoteData = await globalQuoteResponse.json();
     const globalQuote = globalQuoteData["Global Quote"];
-    document.getElementById("price").innerText = globalQuote["01. symbol"]
+    document.getElementById("symbol").innerText = globalQuote["01. symbol"]
     document.getElementById("price").innerText = globalQuote["05. price"]
     document.getElementById("change").innerText = globalQuote["09. change"]
     document.getElementById("open").innerText = globalQuote["02. open"]
@@ -38,37 +38,55 @@ async function fetchSymbolkData() {
     // console.log(stockData)
 // }
 async function stockChartDay() {
-    const chartUrl = `https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol=IBM&interval=60min&apikey=${avKey}`;
+    const chartUrl = `https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol=IBM&interval=15min&apikey=${avKey}`;
     const chartUrlResponse = await fetch(chartUrl);
     const chartData = await chartUrlResponse.json();
-    const chart = chartData["Time Series (60min)"];
-    // var today = new Date();
-    // var dd = String(today.getDate()-1).padStart(2, '0');
-    // var mm = String(today.getMonth() + 1).padStart(2, '0');
-    // var yyyy = today.getFullYear();
-    // today = yyyy + '-' + mm + '-' + dd;
-
-    const chartDataset = Object.values(chart).map(c => c["4. close"]).toReversed()
+    const chart = chartData["Time Series (15min)"];
+    var today = new Date();
+    var dd = String(today.getDate()-1).padStart(2, '0');
+    var mm = String(today.getMonth() + 1).padStart(2, '0');
+    var yyyy = today.getFullYear();
+    today = yyyy + '-' + mm + '-' + dd;
+    const chartDataLabels = Object.keys(chart).toReversed();
+    
+    const dateFilter = chartDataLabels.filter(function(elem){
+        if(elem.includes(today))
+            return elem
+    });
+    const chartDataFiltered = []
+    for(i=0;i<dateFilter.length;i++){
+        chartDataDots.push(chart[dateFilter[i]])
+    }
+    aler
+    const chartDataDots = Object.values(chartDataFiltered).map(c => JSON.parse(c["4. close"])).toReversed()
     const ctx = document.getElementById('myChart');
     new Chart(ctx, {
         type: 'line',
         data: {
-        labels: [],
+        labels: chartDataLabels,
         datasets: [{
-            label: '123',
-            data: [chartDataset],
+            data: chartDataDots,
             borderWidth: 1
         }]
         },
         options: {
         scales: {
             y: {
-            beginAtZero: true
+            beginAtZero: false
             }
         }
         }
     });
 }   
+async function stockChartWeek() {
+    
+}
+async function stockChartMonth() {
+    
+}
+async function stockChartYear() {
+    
+}
 async function fetchNewsData(){
     // const keyword = "Apple";
     const keyword = document.getElementById("stockSymbol").innerText;
