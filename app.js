@@ -37,35 +37,13 @@ async function fetchSymbolkData() {
     // const stockData = await stockResponse.json();
     // console.log(stockData)
 // }
-async function stockChartDay() {
-    const chartUrl = `https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol=IBM&interval=15min&apikey=${avKey}`;
-    const chartUrlResponse = await fetch(chartUrl);
-    const chartData = await chartUrlResponse.json();
-    const chart = chartData["Time Series (15min)"];
-    var today = new Date();
-    var dd = String(today.getDate()-1).padStart(2, '0');
-    var mm = String(today.getMonth() + 1).padStart(2, '0');
-    var yyyy = today.getFullYear();
-    today = yyyy + '-' + mm + '-' + dd;
-    const chartDataLabels = Object.keys(chart).toReversed();
-    
-    const dateFilter = chartDataLabels.filter(function(elem){
-        if(elem.includes(today))
-            return elem
-    });
-    const chartDataFiltered = []
-    for(i=0;i<dateFilter.length;i++){
-        chartDataDots.push(chart[dateFilter[i]])
-    }
-    aler
-    const chartDataDots = Object.values(chartDataFiltered).map(c => JSON.parse(c["4. close"])).toReversed()
-    const ctx = document.getElementById('myChart');
-    new Chart(ctx, {
+const ctx = document.getElementById('myChart');
+const symbolChart = new Chart(ctx, {
         type: 'line',
         data: {
-        labels: chartDataLabels,
+        labels: [],
         datasets: [{
-            data: chartDataDots,
+            data: [],
             borderWidth: 1
         }]
         },
@@ -77,15 +55,120 @@ async function stockChartDay() {
         }
         }
     });
+async function stockChartDay() {
+    const chartUrl = `https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol=IBM&interval=15min&apikey=${avKey}`;
+    const chartResponse = await fetch(chartUrl);
+    const chartData = await chartResponse.json();
+    const chartPerDay = chartData["Time Series (15min)"];
+    var today = new Date();
+    var dd = String(today.getDate()-1).padStart(2, '0');
+    var mm = String(today.getMonth() + 1).padStart(2, '0');
+    var yyyy = today.getFullYear();
+    today = yyyy + '-' + mm + '-' + dd;
+    const chartDayLabels = Object.keys(chartPerDay).toReversed();
+    
+    const filterDay = chartDayLabels.filter(function(elem){
+        if(elem.includes(today))
+            return elem
+    });
+    var filteredDayLabels = []
+    for(i=0;i<filterDay.length;i++){
+        filteredDayLabels.push(chartPerDay[filterDay[i]])
+    }
+    const chartDataDaySet = Object.values(filteredDayLabels).map(c => JSON.parse(c["4. close"]));
+    symbolChart.data.datasets[0].label = 'Стоимость акции в течение дня';
+    symbolChart.data.labels = filterDay;
+    symbolChart.data.datasets[0].data = chartDataDaySet;
+    symbolChart.update();
+    
 }   
+
 async function stockChartWeek() {
-    
+    const chartUrl = `https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=IBM&apikey=${avKey}`;
+    const chartResponse = await fetch(chartUrl);
+    const chartData = await chartResponse.json();
+    const chartPerWeek = chartData["Time Series (Daily)"]
+
+    var lastWeek = [];
+    for(i = 0;i < 5;i++){
+        var weekDay = new Date()
+        var weekDd = String(weekDay.getDate()-i-1).padStart(2, '0');
+        var WeekMm = String(weekDay.getMonth() + 1).padStart(2, '0');
+            if(weekDd<1)
+            {
+                weekDd = String(30 + weekDay.getDate()-i-1).padStart(2, '0');
+                WeekMm = String(weekDay.getMonth()).padStart(2, '0');
+            } 
+        var weekYyyy = weekDay.getFullYear();
+        dayDate = weekYyyy + '-' + WeekMm + '-' + weekDd;
+        lastWeek[i] = dayDate;
+        }
+        //*даты последней недели
+
+     const chartWeekLabels = Object.keys(chartPerWeek);
+        
+     let filteredWeek = [];
+    for(i = 0; i<lastWeek.length;i++){
+        if(chartWeekLabels[i] = lastWeek[i]){
+             filteredWeek.push(chartPerWeek[lastWeek[i]])
+             if(filteredWeek[i] == undefined)
+                 filteredWeek[i] = filteredWeek[i-1]
+        }
+    }
+
+    const chartDataWeekSet = Object.values(filteredWeek).map(c => JSON.parse(c["4. close"])).toReversed();
+    symbolChart.data.datasets[0].label = 'Стоимость акции в течение 5 дней';
+    symbolChart.data.labels = lastWeek.toReversed();
+    symbolChart.data.datasets[0].data = chartDataWeekSet;
+    symbolChart.update();
 }
+
 async function stockChartMonth() {
-    
+    const chartUrl = `https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=IBM&apikey=${avKey}`;
+    const chartResponse = await fetch(chartUrl);
+    const chartData = await chartResponse.json();
+    const chartPerMonth = chartData["Time Series (Daily)"]
+    const chartMonthLabels = Object.keys(chartPerMonth)
+    chartMonthLabels.length = 30 
+    const chartDataMonth = Object.values(chartPerMonth)
+    chartDataMonth.length = 30 
+    const chartDataMonthSet = Object.values(chartDataMonth).map(c => JSON.parse(c["4. close"])).toReversed();
+    symbolChart.data.datasets[0].label = 'Стоимость акции в течение 1 месяца';
+    symbolChart.data.labels = chartMonthLabels.toReversed(); //пофиксить значения в labels и dataset для всех последующих функций
+    symbolChart.data.datasets[0].data = chartDataMonthSet;
+    symbolChart.update();
 }
+
+async function stockChart3Months() {
+    const chartUrl = `https://www.alphavantage.co/query?function=TIME_SERIES_WEEKLY&symbol=IBM&apikey=${avKey}`;
+    const chartResponse = await fetch(chartUrl);
+    const chartData = await chartResponse.json();
+    const chartPer3Month = chartData["Weekly Time Series"]
+    const chart3MonthLabels = Object.keys(chartPer3Month).toReversed()
+    chart3MonthLabels.length = 12
+    const chartData3Month = Object.values(chartPer3Month).toReversed()
+    chartData3Month.length = 12
+    const chartData3MonthSet = Object.values(chartData3Month).map(c => JSON.parse(c["4. close"]));
+    symbolChart.data.datasets[0].label = 'Стоимость акции в течение 3 месяцев';
+    symbolChart.data.labels = chart3MonthLabels;
+    symbolChart.data.datasets[0].data = chartData3MonthSet;
+    symbolChart.update();
+}
+
 async function stockChartYear() {
-    
+    const chartUrl = `https://www.alphavantage.co/query?function=TIME_SERIES_MONTHLY&symbol=IBM&apikey=${avKey}`;
+    const chartResponse = await fetch(chartUrl);
+    const chartData = await chartResponse.json();
+    const chartPerYear = chartData["Monthly Time Series"]
+    const chartYearLabels = Object.keys(chartPerYear).toReversed()
+    chartYearLabels.length = 13
+    const chartDataYear = Object.values(chartPerYear).toReversed()
+    chartDataYear.length = 13
+    const chartDataYearSet = Object.values(chartDataYear).map(c => JSON.parse(c["4. close"]));
+    symbolChart.data.datasets[0].label = 'Стоимость акции в течение года';
+    symbolChart.data.labels = chartYearLabels;
+    symbolChart.data.datasets[0].data = chartDataYearSet;
+    symbolChart.update();
 }
 async function fetchNewsData(){
     // const keyword = "Apple";
