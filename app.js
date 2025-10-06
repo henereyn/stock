@@ -129,10 +129,10 @@ async function stockChartMonth() {
     const chartData = await chartResponse.json();
     const chartPerMonth = chartData["Time Series (Daily)"]
     const chartMonthLabels = Object.keys(chartPerMonth)
-    chartMonthLabels.length = 30 
+    chartMonthLabels.length = 22 
     const chartDataMonth = Object.values(chartPerMonth)
-    chartDataMonth.length = 30 
-    const chartDataMonthSet = Object.values(chartDataMonth).map(c => JSON.parse(c["4. close"])).toReversed();
+    chartDataMonth.length = 22 
+    const chartDataMonthSet = chartDataMonth.map(c => JSON.parse(c["4. close"])).toReversed();
     symbolChart.data.datasets[0].label = 'Стоимость акции в течение 1 месяца';
     symbolChart.data.labels = chartMonthLabels.toReversed(); //пофиксить значения в labels и dataset для всех последующих функций
     symbolChart.data.datasets[0].data = chartDataMonthSet;
@@ -144,13 +144,13 @@ async function stockChart3Months() {
     const chartResponse = await fetch(chartUrl);
     const chartData = await chartResponse.json();
     const chartPer3Month = chartData["Weekly Time Series"]
-    const chart3MonthLabels = Object.keys(chartPer3Month).toReversed()
-    chart3MonthLabels.length = 12
-    const chartData3Month = Object.values(chartPer3Month).toReversed()
-    chartData3Month.length = 12
-    const chartData3MonthSet = Object.values(chartData3Month).map(c => JSON.parse(c["4. close"]));
+    const chart3MonthLabels = Object.keys(chartPer3Month)
+    chart3MonthLabels.length = 14
+    const chartData3Month = Object.values(chartPer3Month)
+    chartData3Month.length = 14
+    const chartData3MonthSet = Object.values(chartData3Month).map(c => JSON.parse(c["4. close"])).toReversed();
     symbolChart.data.datasets[0].label = 'Стоимость акции в течение 3 месяцев';
-    symbolChart.data.labels = chart3MonthLabels;
+    symbolChart.data.labels = chart3MonthLabels.toReversed();
     symbolChart.data.datasets[0].data = chartData3MonthSet;
     symbolChart.update();
 }
@@ -160,13 +160,13 @@ async function stockChartYear() {
     const chartResponse = await fetch(chartUrl);
     const chartData = await chartResponse.json();
     const chartPerYear = chartData["Monthly Time Series"]
-    const chartYearLabels = Object.keys(chartPerYear).toReversed()
+    const chartYearLabels = Object.keys(chartPerYear)
     chartYearLabels.length = 13
-    const chartDataYear = Object.values(chartPerYear).toReversed()
+    const chartDataYear = Object.values(chartPerYear)
     chartDataYear.length = 13
-    const chartDataYearSet = Object.values(chartDataYear).map(c => JSON.parse(c["4. close"]));
+    const chartDataYearSet = Object.values(chartDataYear).map(c => JSON.parse(c["4. close"])).toReversed();
     symbolChart.data.datasets[0].label = 'Стоимость акции в течение года';
-    symbolChart.data.labels = chartYearLabels;
+    symbolChart.data.labels = chartYearLabels.toReversed();
     symbolChart.data.datasets[0].data = chartDataYearSet;
     symbolChart.update();
 }
@@ -184,7 +184,7 @@ async function fetchNewsData(){
         newsToWrap += `<div class="news__card">
             <a href="`+ news.articles[i].url +`"><div class="news__card-title">` + news.articles[i].title + `</div></a>
             <div class="news__card-desc">`+ news.articles[i].description +`</div>
-            <div class="news__card-date"><small>`+ news.articles[i].publishedAt.slice(0,10) +`</small></div>
+            <div class="news__card-date">`+ news.articles[i].publishedAt.slice(0,10) +`</div>
         </div>`
     }
     newsWrapper.innerHTML = newsToWrap;
