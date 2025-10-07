@@ -16,9 +16,10 @@
             Stock Tracker
         </div>
         <div class="header__search">
-            <input type="text" placeholder="Введите тикер или название компании...">
-            <img src="img/Search.svg" alt="searchico">
+            <input type="text" placeholder="Введите тикер или название компании..." id="search__symbol">
+            <img src="img/Search.svg" alt="searchico" onclick="searchSymbol()">
         </div>
+        <small id="search__message"></small>
     </header>
     <main  class="main">
         <div class="container">
@@ -47,24 +48,27 @@
                         Объем продаж
                     </div>
                 </div>
-                <div class="table__row" id="row">
-                    <div class="table__index" id="stockSymbol">
-                        1
+                 <div id="tableSearch">
+                    <div class="table__row" id="row">
+                        <div class="table__index" id="stockSymbol">
+                            1
+                        </div>
+                        <div class="table__name" id="stockName" >
+                            1
+                        </div>
+                        <div class="table__price" id="stockPrice">
+                            цена
+                        </div>
+                        <div class="table__pricediff" id="stockChange">
+                            изменение цены
+                        </div>
+                        <div class="table__volume" id="stockVolume">
+                            объем продаж
+                        </div>
                     </div>
-                    <div class="table__name" id="stockName" >
-                        1
-                    </div>
-                    <div class="table__price" id="stockPrice">
-                        цена
-                    </div>
-                    <div class="table__pricediff" id="stockChange">
-                        изменение цены
-                    </div>
-                    <div class="table__volume" id="stockVolume">
-                        объем продаж
-                    </div>
-                </div>
-                <div class="table__row" id="row">
+                 </div>
+                
+                <!-- <div class="table__row" id="row">
                     <div class="table__index">
                         NVDA
                     </div>
@@ -182,7 +186,7 @@
                     <div class="table__volume">
                         объем продаж
                     </div>
-                </div>
+                </div> -->
             </div>
         </div>
         <div class="overlay" id="overlay"></div>

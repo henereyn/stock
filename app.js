@@ -13,6 +13,30 @@ async function getStockSymbols(){
     document.getElementById("stockChange").innerText = ibm["09. change"]+' '+ibm["10. change percent"];
     document.getElementById("stockVolume").innerText = ibm["06. volume"];
 }
+async function searchSymbol() {
+    const symbol = document.getElementById('search__symbol').value;
+    
+    // if(!symbol){
+    //     document.getElementById('search__message').innerText = 'Укажите в поиске название компании или ее тикер';
+    // }
+    const searchRequest = `https://www.alphavantage.co/query?function=SYMBOL_SEARCH&keywords=${symbol}&apikey=${avKey}`
+    const searhcResponse = await fetch(searchRequest);
+    const searchData = await searhcResponse.json()
+    const search = searchData["bestMatches"]
+    for (let i = 0; i < search.length; i++) {
+        const searchSymbol = `https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=${search[i]["01. symbol"]}&apikey=${avKey}`;
+        const searchSymbolesponse = await fetch(searchSymbol);
+        const searchSymbolData = await searchSymbolesponse.json();
+        const symbolData = searchSymbolData["Global Quote"];
+        document.getElementById('tableSearch').innerHTML = 
+        `<div class="table__index" id="stockSymbol">`+search[i]["01. symbol"]+`</div>
+        <div class="table__name" id="stockName">`+search[i]["02. name"]+`</div>
+        <div class="table__price" id="stockPrice">`+symbolData["05. price"]+`</div>
+        <div class="table__pricediff" id="stockChange">`+symbolData["05. price"]+` `+symbolData["10. change percent"]+`</div>
+        <div class="table__volume" id="stockVolume">`+symbolData["06. volume"]+`</div>`
+    }
+    
+}
 getStockSymbols();
 async function fetchSymbolkData() {
     // const symbol =  "Apple";
@@ -189,9 +213,8 @@ async function fetchNewsData(){
     }
     newsWrapper.innerHTML = newsToWrap;
 }  
-var detailsElem = document.getElementById('details');
-var detailsOpen = document.getElementsByClassName('table__row');
-var overlay = document.getElementById('overlay')
+var detailsElem = document.getElementById('details');//modal
+var detailsOpen = document.getElementsByClassName('table__row');//button
 
 for(let i = 0;i<detailsOpen.length;i++)
     {
@@ -202,8 +225,8 @@ for(let i = 0;i<detailsOpen.length;i++)
     )};
 
 function openDetails(){
+    detailsElem.style.animation = "slideIn 0.5s forwards";
     detailsElem.style.display = 'block';
-    overlay.style.display = 'block';
     fetchSymbolkData()
     fetchNewsData();
     stockChartDay();
@@ -217,7 +240,12 @@ function openDetails(){
 // );
 document.querySelector('.details__close').addEventListener('click',function()
     {
-        detailsElem.style.display = 'none';
-        overlay.style.display = 'none';
+        detailsElem.style.animation = "slideOut 0.5s forwards";
+        
+        setTimeout(function(){
+            detailsElem.style.animation = ""
+            detailsElem.style.display = 'none';
+        },500);
+        
     }
 );
