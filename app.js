@@ -2,17 +2,68 @@
 const avKey = 'JG5BTF4B8AXHCCKI';
 const newsKey = "203a3bbc12ff4ff18ffdfce847b6f27a";
 // const avUrl = "//www.alphavantage.co/query?function=GLOBAL_QUOTE&amp;symbol=";
-// const newsUrl = "https://newsapi.org/v2/everything?q="
+const newsUrl = "https://newsapi.org/v2/everything?q=";
+const ninjaApiKey = "D0oar+GVifLPv3Uso+w7bw==ZD2btbpinAr9WsCd";
+const polygonApiKey = "3KtCYpgimlWriDKLJa11M2WaYljpqxkP";
+function shortNum(n) {
+	return n.toString()
+        .replace(/(\d)(\d)\d{8}$/, "$1.$2B")
+		.replace(/(\d)(\d)\d{5}$/, "$1.$2M")
+		.replace(/(\d)(\d)\d{2}$/, "$1.$2K");
+    }
 async function getStockSymbols(){
-    const ibmSymbol = `https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=IBM&apikey=${avKey}`;
-    const ibmResponse = await fetch(ibmSymbol);
-    const ibmData = await ibmResponse.json();
-    const ibm = ibmData["Global Quote"];
-    document.getElementById("stockSymbol").innerText = ibm["01. symbol"];
-    document.getElementById("stockPrice").innerText = ibm["05. price"]
-    document.getElementById("stockChange").innerText = ibm["09. change"]+' '+ibm["10. change percent"];
-    document.getElementById("stockVolume").innerText = ibm["06. volume"];
+    // const ibmSymbol = `https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=IBM&apikey=${avKey}`;
+    // const ibmResponse = await fetch(ibmSymbol);
+    // const ibmData = await ibmResponse.json();
+    // const ibm = ibmData["Global Quote"];
+    // document.getElementById("stockSymbol").innerText = ibm["01. symbol"];
+    // document.getElementById("stockPrice").innerText = ibm["05. price"]
+    // document.getElementById("stockChange").innerText = ibm["09. change"]+' '+ibm["10. change percent"];
+    // document.getElementById("stockVolume").innerText = ibm["06. volume"];
+    const options = {
+        method: "GET",
+        headers: {
+            "X-Api-Key" : ninjaApiKey
+        }
+    }
+    const apiSpUrl = "https://api.api-ninjas.com/v1/sp500";
+
+    try{
+        const response  = await fetch(apiSpUrl,options)
+        const data = await response.json();
+        data.length = 3
+
+        for(let i = 0; i<data.length; i++){
+            const apiPriceUrl = `https://api.polygon.io/v2/aggs/ticker/${data[i]["ticker"]}/prev?adjusted=true&apiKey=${polygonApiKey}`
+            const priceResponse = await fetch(apiPriceUrl);
+            const priceData = await priceResponse.json();
+           const price = priceData["results"][0]
+            document.getElementById("mainTable").innerHTML += 
+            `<div class="table__row" id="row" onclick="openDetails('${data[i]["ticker"]}')">
+                    <div class="table__index" id="stockSymbol">
+                        `+data[i]["ticker"]+`
+                    </div>
+                    <div class="table__name" >
+                        `+data[i]["company_name"]+`
+                    </div>
+                    <div class="table__price">
+                        `+price["c"]+ ` $
+                    </div>
+                    <div class="table__pricediff">
+                        Изменение цены
+                    </div>
+                    <div class="table__volume">
+                        `+shortNum(price["v"])+`
+                    </div>
+                </div>`
+        }
+    }
+
+    catch (error){
+
+    }
 }
+getStockSymbols();
 async function searchSymbol() {
     const symbol = document.getElementById('search__symbol').value;
     
@@ -37,21 +88,20 @@ async function searchSymbol() {
     }
     
 }
-getStockSymbols();
-async function fetchSymbolkData() {
+async function fetchSymbolkData(symbolId) {
     // const symbol =  "Apple";
-    const symbol = document.getElementById("stockSymbol").innerText;
+    const symbol = symbolId;
     const globalQuotekUrl = `https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=${symbol}&apikey=${avKey}`;
     const globalQuoteResponse = await fetch(globalQuotekUrl);
     const globalQuoteData = await globalQuoteResponse.json();
     const globalQuote = globalQuoteData["Global Quote"];
     document.getElementById("symbol").innerText = globalQuote["01. symbol"]
-    document.getElementById("price").innerText = globalQuote["05. price"]
-    document.getElementById("change").innerText = globalQuote["09. change"]
-    document.getElementById("open").innerText = globalQuote["02. open"]
-    document.getElementById("high").innerText = globalQuote["03. high"]
-    document.getElementById("low").innerText = globalQuote[ "04. low"]
-    document.getElementById("volume").innerText = globalQuote["06. volume"]
+    document.getElementById("price").innerText = parseFloat(globalQuote["05. price"]).toFixed(2) + ' $'
+    document.getElementById("change").innerText = parseFloat(globalQuote["09. change"]).toFixed(2) + ' %'
+    document.getElementById("open").innerText = parseFloat(globalQuote["02. open"]).toFixed(2) + ' $'
+    document.getElementById("high").innerText = parseFloat(globalQuote["03. high"]).toFixed(2) + ' $'
+    document.getElementById("low").innerText = parseFloat(globalQuote[ "04. low"]).toFixed(2) + ' $'
+    document.getElementById("volume").innerText = shortNum(globalQuote["06. volume"])
 
     // console.log(news.articles[0].title,news.articles[0].description);
 };
@@ -79,8 +129,8 @@ const symbolChart = new Chart(ctx, {
         }
         }
     });
-async function stockChartDay() {
-    const chartUrl = `https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol=IBM&interval=15min&apikey=${avKey}`;
+async function stockChartDay(symbolId) {
+    const chartUrl = `https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol=${symbolId}&interval=15min&apikey=${avKey}`;
     const chartResponse = await fetch(chartUrl);
     const chartData = await chartResponse.json();
     const chartPerDay = chartData["Time Series (15min)"];
@@ -105,10 +155,12 @@ async function stockChartDay() {
     symbolChart.data.datasets[0].data = chartDataDaySet;
     symbolChart.update();
     
+    return symbol = symbolId
+    
 }   
 
-async function stockChartWeek() {
-    const chartUrl = `https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=IBM&apikey=${avKey}`;
+async function stockChartWeek(symbol) {
+    const chartUrl = `https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=${symbol}&apikey=${avKey}`;
     const chartResponse = await fetch(chartUrl);
     const chartData = await chartResponse.json();
     const chartPerWeek = chartData["Time Series (Daily)"]
@@ -147,8 +199,8 @@ async function stockChartWeek() {
     symbolChart.update();
 }
 
-async function stockChartMonth() {
-    const chartUrl = `https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=IBM&apikey=${avKey}`;
+async function stockChartMonth(symbol) {
+    const chartUrl = `https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=${symbol}apikey=${avKey}`;
     const chartResponse = await fetch(chartUrl);
     const chartData = await chartResponse.json();
     const chartPerMonth = chartData["Time Series (Daily)"]
@@ -163,8 +215,8 @@ async function stockChartMonth() {
     symbolChart.update();
 }
 
-async function stockChart3Months() {
-    const chartUrl = `https://www.alphavantage.co/query?function=TIME_SERIES_WEEKLY&symbol=IBM&apikey=${avKey}`;
+async function stockChart3Months(symbol) {
+    const chartUrl = `https://www.alphavantage.co/query?function=TIME_SERIES_WEEKLY&symbol=${symbol}&apikey=${avKey}`;
     const chartResponse = await fetch(chartUrl);
     const chartData = await chartResponse.json();
     const chartPer3Month = chartData["Weekly Time Series"]
@@ -179,8 +231,8 @@ async function stockChart3Months() {
     symbolChart.update();
 }
 
-async function stockChartYear() {
-    const chartUrl = `https://www.alphavantage.co/query?function=TIME_SERIES_MONTHLY&symbol=IBM&apikey=${avKey}`;
+async function stockChartYear(symbol) {
+    const chartUrl = `https://www.alphavantage.co/query?function=TIME_SERIES_MONTHLY&symbol=${symbol}&apikey=${avKey}`;
     const chartResponse = await fetch(chartUrl);
     const chartData = await chartResponse.json();
     const chartPerYear = chartData["Monthly Time Series"]
@@ -194,9 +246,9 @@ async function stockChartYear() {
     symbolChart.data.datasets[0].data = chartDataYearSet;
     symbolChart.update();
 }
-async function fetchNewsData(){
+async function fetchNewsData(symbolId){
     // const keyword = "Apple";
-    const keyword = document.getElementById("stockSymbol").innerText;
+    const keyword = symbolId;
     const newsUrl = `https://newsapi.org/v2/everything?q=${keyword}&apiKey=${newsKey}&language=en&pageSize=10`;
     
     const newsResponse = await fetch(newsUrl);
@@ -207,29 +259,21 @@ async function fetchNewsData(){
     {
         newsToWrap += `<div class="news__card">
             <a href="`+ news.articles[i].url +`"><div class="news__card-title">` + news.articles[i].title + `</div></a>
-            <div class="news__card-desc">`+ news.articles[i].description +`</div>
+            <div class="news__card-desc">${news.articles[i].description == null? 'Описание отсутствует' : news.articles[i].description}</div>
             <div class="news__card-date">`+ news.articles[i].publishedAt.slice(0,10) +`</div>
         </div>`
     }
     newsWrapper.innerHTML = newsToWrap;
 }  
 var detailsElem = document.getElementById('details');//modal
-var detailsOpen = document.getElementsByClassName('table__row');//button
 
-for(let i = 0;i<detailsOpen.length;i++)
-    {
-        detailsOpen[i].addEventListener('click',function()
-        {
-            openDetails();
-        }
-    )};
 
-function openDetails(){
+function openDetails(symbolId){
     detailsElem.style.animation = "slideIn 0.5s forwards";
     detailsElem.style.display = 'block';
-    fetchSymbolkData()
-    fetchNewsData();
-    stockChartDay();
+    fetchSymbolkData(symbolId)
+    fetchNewsData(symbolId);
+    stockChartDay(symbolId);
 }
 // document.querySelector('.table__row').addEventListener('click',function()
 //     {
@@ -241,7 +285,7 @@ function openDetails(){
 document.querySelector('.details__close').addEventListener('click',function()
     {
         detailsElem.style.animation = "slideOut 0.5s forwards";
-        
+
         setTimeout(function(){
             detailsElem.style.animation = ""
             detailsElem.style.display = 'none';
