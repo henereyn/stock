@@ -1,8 +1,5 @@
-// XF0O2FERESOVR20S
 const avKey = 'JG5BTF4B8AXHCCKI';
 const newsKey = "203a3bbc12ff4ff18ffdfce847b6f27a";
-// const avUrl = "//www.alphavantage.co/query?function=GLOBAL_QUOTE&amp;symbol=";
-const newsUrl = "https://newsapi.org/v2/everything?q=";
 const ninjaApiKey = "D0oar+GVifLPv3Uso+w7bw==ZD2btbpinAr9WsCd";
 const polygonApiKey = "3KtCYpgimlWriDKLJa11M2WaYljpqxkP";
 function shortNum(n) {
@@ -11,15 +8,9 @@ function shortNum(n) {
 		.replace(/(\d)(\d)\d{5}$/, "$1.$2M")
 		.replace(/(\d)(\d)\d{2}$/, "$1.$2K");
     }
+var chartSymbol = ''
+var tableContent = document.getElementById("mainTable")
 async function getStockSymbols(){
-    // const ibmSymbol = `https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=IBM&apikey=${avKey}`;
-    // const ibmResponse = await fetch(ibmSymbol);
-    // const ibmData = await ibmResponse.json();
-    // const ibm = ibmData["Global Quote"];
-    // document.getElementById("stockSymbol").innerText = ibm["01. symbol"];
-    // document.getElementById("stockPrice").innerText = ibm["05. price"]
-    // document.getElementById("stockChange").innerText = ibm["09. change"]+' '+ibm["10. change percent"];
-    // document.getElementById("stockVolume").innerText = ibm["06. volume"];
     const options = {
         method: "GET",
         headers: {
@@ -28,7 +19,6 @@ async function getStockSymbols(){
     }
     const apiSpUrl = "https://api.api-ninjas.com/v1/sp500";
 
-    try{
         const response  = await fetch(apiSpUrl,options)
         const data = await response.json();
         data.length = 3
@@ -37,8 +27,12 @@ async function getStockSymbols(){
             const apiPriceUrl = `https://api.polygon.io/v2/aggs/ticker/${data[i]["ticker"]}/prev?adjusted=true&apiKey=${polygonApiKey}`
             const priceResponse = await fetch(apiPriceUrl);
             const priceData = await priceResponse.json();
-           const price = priceData["results"][0]
-            document.getElementById("mainTable").innerHTML += 
+            const price = priceData["results"][0]
+            const apiChangeUrl =  `https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=${data[i]["ticker"]}&apikey=${avKey}`;
+            const changeResponse = await fetch(apiChangeUrl);
+            const changeData = await changeResponse.json();
+            const change = changeData["Global Quote"]
+            tableContent.innerHTML += 
             `<div class="table__row" id="row" onclick="openDetails('${data[i]["ticker"]}')">
                     <div class="table__index" id="stockSymbol">
                         `+data[i]["ticker"]+`
@@ -50,48 +44,81 @@ async function getStockSymbols(){
                         `+price["c"]+ ` $
                     </div>
                     <div class="table__pricediff">
-                        Изменение цены
+                        `+parseFloat(symbolData["09. change"]).toFixed(2)+` $`+` `+symbolData["10. change percent"]+`
                     </div>
                     <div class="table__volume">
                         `+shortNum(price["v"])+`
                     </div>
                 </div>`
+            var change = document.getElementsByClassName('table__pricediff')
+            for(i = 0;i < change.length; i++)
+            {
+                if(symbolData["09. change"]>= 0)
+                {
+                    change[i].style.color = 'green'
+                }
+                else
+                {
+                    change[i].style.color = 'red'
+                }
+            }
         }
+        
     }
-
-    catch (error){
-
-    }
-}
 getStockSymbols();
 async function searchSymbol() {
     const symbol = document.getElementById('search__symbol').value;
-    
-    // if(!symbol){
-    //     document.getElementById('search__message').innerText = 'Укажите в поиске название компании или ее тикер';
-    // }
+    tableContent.innerHTML = ''
     const searchRequest = `https://www.alphavantage.co/query?function=SYMBOL_SEARCH&keywords=${symbol}&apikey=${avKey}`
     const searhcResponse = await fetch(searchRequest);
     const searchData = await searhcResponse.json()
     const search = searchData["bestMatches"]
+    if(search == ''){
+        alert('По вашему запросу ничего не найдено')
+    }
     for (let i = 0; i < search.length; i++) {
-        const searchSymbol = `https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=${search[i]["01. symbol"]}&apikey=${avKey}`;
+        const searchSymbol = `https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=${search[i]["1. symbol"]}&apikey=${avKey}`;
         const searchSymbolesponse = await fetch(searchSymbol);
         const searchSymbolData = await searchSymbolesponse.json();
         const symbolData = searchSymbolData["Global Quote"];
-        document.getElementById('tableSearch').innerHTML = 
-        `<div class="table__index" id="stockSymbol">`+search[i]["01. symbol"]+`</div>
-        <div class="table__name" id="stockName">`+search[i]["02. name"]+`</div>
-        <div class="table__price" id="stockPrice">`+symbolData["05. price"]+`</div>
-        <div class="table__pricediff" id="stockChange">`+symbolData["05. price"]+` `+symbolData["10. change percent"]+`</div>
-        <div class="table__volume" id="stockVolume">`+symbolData["06. volume"]+`</div>`
+      
+        tableContent.innerHTML += 
+        `<div class="table__row" id="row" onclick="openDetails('${search[i]["1. symbol"]}')">
+            <div class="table__index" id="stockSymbol">
+                `+search[i]["1. symbol"]+
+            `</div>
+            <div class="table__name">
+                `+search[i]["2. name"]+`
+            </div>
+            <div class="table__price">
+                `+parseFloat(symbolData["05. price"]).toFixed(2)+` $
+            </div>
+            <div class="table__pricediff">
+                `+parseFloat(symbolData["09. change"]).toFixed(2)+` $`+` `+symbolData["10. change percent"]+
+            `</div>
+            <div class="table__volume" id="stockVolume">
+                `+shortNum(symbolData["06. volume"])+
+            `</div>
+        </div`
+        var change = document.getElementsByClassName('table__pricediff')
+        for(i = 0;i < change.length; i++)
+        {
+            if(symbolData["09. change"]>= 0)
+            {
+                change[i].style.color = 'green'
+            }
+            else
+            {
+                change[i].style.color = 'red'
+            }
+        }
+        
     }
     
 }
 async function fetchSymbolkData(symbolId) {
-    // const symbol =  "Apple";
-    const symbol = symbolId;
-    const globalQuotekUrl = `https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=${symbol}&apikey=${avKey}`;
+    chartSymbol = symbolId;
+    const globalQuotekUrl = `https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=${chartSymbol}&apikey=${avKey}`;
     const globalQuoteResponse = await fetch(globalQuotekUrl);
     const globalQuoteData = await globalQuoteResponse.json();
     const globalQuote = globalQuoteData["Global Quote"];
@@ -102,15 +129,8 @@ async function fetchSymbolkData(symbolId) {
     document.getElementById("high").innerText = parseFloat(globalQuote["03. high"]).toFixed(2) + ' $'
     document.getElementById("low").innerText = parseFloat(globalQuote[ "04. low"]).toFixed(2) + ' $'
     document.getElementById("volume").innerText = shortNum(globalQuote["06. volume"])
-
-    // console.log(news.articles[0].title,news.articles[0].description);
 };
-    // document.getElementById('stockData').innerHTML = stock;
-    // const stockUrl = `https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=${symbol}&apikey=${avKey}`;
-    // const stockResponse = await fetch(stockUrl);
-    // const stockData = await stockResponse.json();
-    // console.log(stockData)
-// }
+
 const ctx = document.getElementById('myChart');
 const symbolChart = new Chart(ctx, {
         type: 'line',
@@ -129,8 +149,10 @@ const symbolChart = new Chart(ctx, {
         }
         }
     });
-async function stockChartDay(symbolId) {
-    const chartUrl = `https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol=${symbolId}&interval=15min&apikey=${avKey}`;
+async function stockChartDay() {
+    
+
+    const chartUrl = `https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol=${chartSymbol}&interval=15min&apikey=${avKey}`;
     const chartResponse = await fetch(chartUrl);
     const chartData = await chartResponse.json();
     const chartPerDay = chartData["Time Series (15min)"];
@@ -155,12 +177,10 @@ async function stockChartDay(symbolId) {
     symbolChart.data.datasets[0].data = chartDataDaySet;
     symbolChart.update();
     
-    return symbol = symbolId
-    
 }   
 
-async function stockChartWeek(symbol) {
-    const chartUrl = `https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=${symbol}&apikey=${avKey}`;
+async function stockChartWeek() {
+    const chartUrl = `https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=${chartSymbol}&apikey=${avKey}`;
     const chartResponse = await fetch(chartUrl);
     const chartData = await chartResponse.json();
     const chartPerWeek = chartData["Time Series (Daily)"]
@@ -199,8 +219,8 @@ async function stockChartWeek(symbol) {
     symbolChart.update();
 }
 
-async function stockChartMonth(symbol) {
-    const chartUrl = `https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=${symbol}apikey=${avKey}`;
+async function stockChartMonth() {
+    const chartUrl = `https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=${chartSymbol}&apikey=${avKey}`;
     const chartResponse = await fetch(chartUrl);
     const chartData = await chartResponse.json();
     const chartPerMonth = chartData["Time Series (Daily)"]
@@ -210,13 +230,13 @@ async function stockChartMonth(symbol) {
     chartDataMonth.length = 22 
     const chartDataMonthSet = chartDataMonth.map(c => JSON.parse(c["4. close"])).toReversed();
     symbolChart.data.datasets[0].label = 'Стоимость акции в течение 1 месяца';
-    symbolChart.data.labels = chartMonthLabels.toReversed(); //пофиксить значения в labels и dataset для всех последующих функций
+    symbolChart.data.labels = chartMonthLabels.toReversed();
     symbolChart.data.datasets[0].data = chartDataMonthSet;
     symbolChart.update();
 }
 
-async function stockChart3Months(symbol) {
-    const chartUrl = `https://www.alphavantage.co/query?function=TIME_SERIES_WEEKLY&symbol=${symbol}&apikey=${avKey}`;
+async function stockChart3Months() {
+    const chartUrl = `https://www.alphavantage.co/query?function=TIME_SERIES_WEEKLY&symbol=${chartSymbol}&apikey=${avKey}`;
     const chartResponse = await fetch(chartUrl);
     const chartData = await chartResponse.json();
     const chartPer3Month = chartData["Weekly Time Series"]
@@ -231,8 +251,8 @@ async function stockChart3Months(symbol) {
     symbolChart.update();
 }
 
-async function stockChartYear(symbol) {
-    const chartUrl = `https://www.alphavantage.co/query?function=TIME_SERIES_MONTHLY&symbol=${symbol}&apikey=${avKey}`;
+async function stockChartYear() {
+    const chartUrl = `https://www.alphavantage.co/query?function=TIME_SERIES_MONTHLY&symbol=${chartSymbol}&apikey=${avKey}`;
     const chartResponse = await fetch(chartUrl);
     const chartData = await chartResponse.json();
     const chartPerYear = chartData["Monthly Time Series"]
@@ -247,7 +267,6 @@ async function stockChartYear(symbol) {
     symbolChart.update();
 }
 async function fetchNewsData(symbolId){
-    // const keyword = "Apple";
     const keyword = symbolId;
     const newsUrl = `https://newsapi.org/v2/everything?q=${keyword}&apiKey=${newsKey}&language=en&pageSize=10`;
     
@@ -264,7 +283,7 @@ async function fetchNewsData(symbolId){
         </div>`
     }
     newsWrapper.innerHTML = newsToWrap;
-}  
+}
 var detailsElem = document.getElementById('details');//modal
 
 
@@ -275,13 +294,6 @@ function openDetails(symbolId){
     fetchNewsData(symbolId);
     stockChartDay(symbolId);
 }
-// document.querySelector('.table__row').addEventListener('click',function()
-//     {
-//         this.classList.toggle('active');
-//         detailsElem.style.display = 'block';
-//         fetchNewsData();
-//     }
-// );
 document.querySelector('.details__close').addEventListener('click',function()
     {
         detailsElem.style.animation = "slideOut 0.5s forwards";

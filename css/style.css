@@ -97,6 +97,10 @@ body
     border: none !important;
     cursor: default !important;
 }
+.pricediff__index
+{
+    color: black !important;
+}
 .details
 {
     z-index: 2;
