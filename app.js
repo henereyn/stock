@@ -44,22 +44,22 @@ async function getStockSymbols(){
                         `+price["c"]+ ` $
                     </div>
                     <div class="table__pricediff">
-                        `+parseFloat(symbolData["09. change"]).toFixed(2)+` $`+` `+symbolData["10. change percent"]+`
+
                     </div>
                     <div class="table__volume">
                         `+shortNum(price["v"])+`
                     </div>
                 </div>`
-            var change = document.getElementsByClassName('table__pricediff')
-            for(i = 0;i < change.length; i++)
+            var changeRow = document.getElementsByClassName('table__pricediff')
+            for(i = 0;i < changeRow.length; i++)
             {
-                if(symbolData["09. change"]>= 0)
+                if(change["09. change"]>= 0)
                 {
-                    change[i].style.color = 'green'
+                    changeRow[i].style.color = 'green'
                 }
                 else
                 {
-                    change[i].style.color = 'red'
+                    changeRow[i].style.color = 'red'
                 }
             }
         }
@@ -150,120 +150,178 @@ const symbolChart = new Chart(ctx, {
         }
     });
 async function stockChartDay() {
-    
-
-    const chartUrl = `https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol=${chartSymbol}&interval=15min&apikey=${avKey}`;
-    const chartResponse = await fetch(chartUrl);
-    const chartData = await chartResponse.json();
-    const chartPerDay = chartData["Time Series (15min)"];
     var today = new Date();
-    var dd = String(today.getDate()-1).padStart(2, '0');
+    var toDd = String(today.getDate()-1).padStart(2, '0');
+    var fromDd = String(today.getDate()-3).padStart(2, '0');
     var mm = String(today.getMonth() + 1).padStart(2, '0');
     var yyyy = today.getFullYear();
-    today = yyyy + '-' + mm + '-' + dd;
-    const chartDayLabels = Object.keys(chartPerDay).toReversed();
-    
-    const filterDay = chartDayLabels.filter(function(elem){
-        if(elem.includes(today))
-            return elem
-    });
-    var filteredDayLabels = []
-    for(i=0;i<filterDay.length;i++){
-        filteredDayLabels.push(chartPerDay[filterDay[i]])
+    var toDay = yyyy + '-' + mm + '-' + toDd;
+    var fromDay =  yyyy + '-' + mm + '-' + fromDd;
+    const chartUrl = `https://api.polygon.io/v2/aggs/ticker/${chartSymbol}/range/30/minute/${fromDay}/${toDay}?adjusted=true&sort=asc&limit=120&apiKey=${polygonApiKey}`;
+    const chartResponse = await fetch(chartUrl);
+    const chartData = await chartResponse.json();
+    const chartPerDay = chartData['results'];
+    const chartDayLabels = []
+    const chartDayPrices = []
+    for(let i = 0;i<chartPerDay.length;i++){
+        chartDayLabels.push(new Date(chartPerDay[i]['t']).toLocaleTimeString());
+        chartDayPrices.push(chartPerDay[i]['c']);
     }
-    const chartDataDaySet = Object.values(filteredDayLabels).map(c => JSON.parse(c["4. close"]));
+
+    // const chartPerDay = chartData["Time Series (15min)"];
+    // const chartDayLabels = Object.keys(chartPerDay).toReversed();
+    // const filterDay = chartDayLabels.filter(function(elem){
+    //     if(elem.includes(today))
+    //         return elem
+    // });
+    // var filteredDayLabels = []
+    // for(i=0;i<filterDay.length;i++){
+    //     filteredDayLabels.push(chartPerDay[filterDay[i]])
+    // }
+    // alert(chartDayLabels)
     symbolChart.data.datasets[0].label = 'Стоимость акции в течение дня';
-    symbolChart.data.labels = filterDay;
-    symbolChart.data.datasets[0].data = chartDataDaySet;
+    symbolChart.data.labels = chartDayLabels;
+    symbolChart.data.datasets[0].data = chartDayPrices;
     symbolChart.update();
     
 }   
 
 async function stockChartWeek() {
-    const chartUrl = `https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=${chartSymbol}&apikey=${avKey}`;
+    var today = new Date();
+    var toDd = String(today.getDate()-1).padStart(2, '0');
+    var fromDd = String(today.getDate()-7).padStart(2, '0');
+    var mm = String(today.getMonth() + 1).padStart(2, '0');
+    var yyyy = today.getFullYear();
+    var toDay = yyyy + '-' + mm + '-' + toDd;
+    var fromDay =  yyyy + '-' + mm + '-' + fromDd;
+    const chartUrl = `https://api.polygon.io/v2/aggs/ticker/${chartSymbol}/range/1/day/${fromDay}/${toDay}?adjusted=true&sort=asc&limit=120&apiKey=${polygonApiKey}`;
     const chartResponse = await fetch(chartUrl);
     const chartData = await chartResponse.json();
-    const chartPerWeek = chartData["Time Series (Daily)"]
-
-    var lastWeek = [];
-    for(i = 0;i < 5;i++){
-        var weekDay = new Date()
-        var weekDd = String(weekDay.getDate()-i-1).padStart(2, '0');
-        var WeekMm = String(weekDay.getMonth() + 1).padStart(2, '0');
-            if(weekDd<1)
-            {
-                weekDd = String(30 + weekDay.getDate()-i-1).padStart(2, '0');
-                WeekMm = String(weekDay.getMonth()).padStart(2, '0');
-            } 
-        var weekYyyy = weekDay.getFullYear();
-        dayDate = weekYyyy + '-' + WeekMm + '-' + weekDd;
-        lastWeek[i] = dayDate;
-        }
-        //*даты последней недели
-
-     const chartWeekLabels = Object.keys(chartPerWeek);
-        
-     let filteredWeek = [];
-    for(i = 0; i<lastWeek.length;i++){
-        if(chartWeekLabels[i] = lastWeek[i]){
-             filteredWeek.push(chartPerWeek[lastWeek[i]])
-             if(filteredWeek[i] == undefined)
-                 filteredWeek[i] = filteredWeek[i-1]
-        }
+    const chartPerWeek = chartData['results']
+    const chartWeekLabels = []
+    const chartWeekPrices = []
+    for(let i = 0;i<chartPerWeek.length;i++){
+        chartWeekLabels.push(new Date(chartPerWeek[i]['t']).toLocaleDateString());
+        chartWeekPrices.push(chartPerWeek[i]['c']);
     }
+    // var lastWeek = [];
+    // for(i = 0;i < 5;i++){
+    //     var weekDay = new Date()
+    //     var weekDd = String(weekDay.getDate()-i-1).padStart(2, '0');
+    //     var WeekMm = String(weekDay.getMonth() + 1).padStart(2, '0');
+    //         if(weekDd<1)
+    //         {
+    //             weekDd = String(30 + weekDay.getDate()-i-1).padStart(2, '0');
+    //             WeekMm = String(weekDay.getMonth()).padStart(2, '0');
+    //         } 
+    //     var weekYyyy = weekDay.getFullYear();
+    //     dayDate = weekYyyy + '-' + WeekMm + '-' + weekDd;
+    //     lastWeek[i] = dayDate;
+    //     }
+    //     //*даты последней недели
 
-    const chartDataWeekSet = Object.values(filteredWeek).map(c => JSON.parse(c["4. close"])).toReversed();
+    //  const chartWeekLabels = Object.keys(chartPerWeek);
+        
+    //  let filteredWeek = [];
+    // for(i = 0; i<lastWeek.length;i++){
+    //     if(chartWeekLabels[i] = lastWeek[i]){
+    //          filteredWeek.push(chartPerWeek[lastWeek[i]])
+    //          if(filteredWeek[i] == undefined)
+    //              filteredWeek[i] = filteredWeek[i-1]
+    //     }
+    // }
+
+    // const chartDataWeekSet = Object.values(filteredWeek).map(c => JSON.parse(c["4. close"])).toReversed();
     symbolChart.data.datasets[0].label = 'Стоимость акции в течение 5 дней';
-    symbolChart.data.labels = lastWeek.toReversed();
-    symbolChart.data.datasets[0].data = chartDataWeekSet;
+    symbolChart.data.labels = chartWeekLabels;
+    symbolChart.data.datasets[0].data = chartWeekPrices;
     symbolChart.update();
 }
 
 async function stockChartMonth() {
-    const chartUrl = `https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=${chartSymbol}&apikey=${avKey}`;
+    var today = new Date();
+    var dd = String(today.getDate()-1).padStart(2, '0');
+    var fromMm = String(today.getMonth()).padStart(2, '0');
+    var toMm = String(today.getMonth() + 1).padStart(2, '0');
+    var yyyy = today.getFullYear();
+    var toDay = yyyy + '-' + toMm + '-' + dd;
+    var fromDay =  yyyy + '-' + fromMm + '-' + dd;
+    const chartUrl = `https://api.polygon.io/v2/aggs/ticker/${chartSymbol}/range/1/day/${fromDay}/${toDay}?adjusted=true&sort=asc&limit=120&apiKey=${polygonApiKey}`;
     const chartResponse = await fetch(chartUrl);
     const chartData = await chartResponse.json();
-    const chartPerMonth = chartData["Time Series (Daily)"]
-    const chartMonthLabels = Object.keys(chartPerMonth)
-    chartMonthLabels.length = 22 
-    const chartDataMonth = Object.values(chartPerMonth)
-    chartDataMonth.length = 22 
-    const chartDataMonthSet = chartDataMonth.map(c => JSON.parse(c["4. close"])).toReversed();
+    const chartPerMonth = chartData['results']
+    const chartMonthLabels = []
+    const chartMonthPrices = []
+    for(let i = 0;i<chartPerMonth.length;i++){
+        chartMonthLabels.push(new Date(chartPerMonth[i]['t']).toLocaleDateString());
+        chartMonthPrices.push(chartPerMonth[i]['c']);
+    }
+    // const chartMonthLabels = Object.keys(chartPerMonth)
+    // chartMonthLabels.length = 22 
+    // const chartDataMonth = Object.values(chartPerMonth)
+    // chartDataMonth.length = 22 
+    // const chartDataMonthSet = chartDataMonth.map(c => JSON.parse(c["4. close"])).toReversed();
     symbolChart.data.datasets[0].label = 'Стоимость акции в течение 1 месяца';
-    symbolChart.data.labels = chartMonthLabels.toReversed();
-    symbolChart.data.datasets[0].data = chartDataMonthSet;
+    symbolChart.data.labels = chartMonthLabels;
+    symbolChart.data.datasets[0].data = chartMonthPrices;
     symbolChart.update();
 }
 
 async function stockChart3Months() {
-    const chartUrl = `https://www.alphavantage.co/query?function=TIME_SERIES_WEEKLY&symbol=${chartSymbol}&apikey=${avKey}`;
+    var today = new Date();
+    var dd = String(today.getDate()-1).padStart(2, '0');
+    var fromMm = String(today.getMonth()-2).padStart(2, '0');
+    var toMm = String(today.getMonth() + 1).padStart(2, '0');
+    var yyyy = today.getFullYear();
+    var toDay = yyyy + '-' + toMm + '-' + dd;
+    var fromDay =  yyyy + '-' + fromMm + '-' + dd;
+    const chartUrl =  `https://api.polygon.io/v2/aggs/ticker/${chartSymbol}/range/1/week/${fromDay}/${toDay}?adjusted=true&sort=asc&limit=120&apiKey=${polygonApiKey}`;
     const chartResponse = await fetch(chartUrl);
     const chartData = await chartResponse.json();
-    const chartPer3Month = chartData["Weekly Time Series"]
-    const chart3MonthLabels = Object.keys(chartPer3Month)
-    chart3MonthLabels.length = 14
-    const chartData3Month = Object.values(chartPer3Month)
-    chartData3Month.length = 14
-    const chartData3MonthSet = Object.values(chartData3Month).map(c => JSON.parse(c["4. close"])).toReversed();
+    const chartPer3Month = chartData['results']
+    const chart3MonthLabels = []
+    const chart3MonthPrices = []
+    for(let i = 0;i<chartPer3Month.length;i++){
+        chart3MonthLabels.push(new Date(chartPer3Month[i]['t']).toLocaleDateString());
+        chart3MonthPrices.push(chartPer3Month[i]['c']);
+    }
+    // const chart3MonthLabels = Object.keys(chartPer3Month)
+    // chart3MonthLabels.length = 14
+    // const chartData3Month = Object.values(chartPer3Month)
+    // chartData3Month.length = 14
+    // const chartData3MonthSet = Object.values(chartData3Month).map(c => JSON.parse(c["4. close"])).toReversed();
     symbolChart.data.datasets[0].label = 'Стоимость акции в течение 3 месяцев';
-    symbolChart.data.labels = chart3MonthLabels.toReversed();
-    symbolChart.data.datasets[0].data = chartData3MonthSet;
+    symbolChart.data.labels = chart3MonthLabels
+    symbolChart.data.datasets[0].data = chart3MonthPrices;
     symbolChart.update();
 }
 
 async function stockChartYear() {
-    const chartUrl = `https://www.alphavantage.co/query?function=TIME_SERIES_MONTHLY&symbol=${chartSymbol}&apikey=${avKey}`;
+    var today = new Date();
+    var dd = String(today.getDate()-1).padStart(2, '0');
+    var mm = String(today.getMonth()+1).padStart(2, '0');
+    var fromYyyy = today.getFullYear()-1;
+    var toYyyy = today.getFullYear();
+    var toDay = toYyyy + '-' + mm + '-' + dd;
+    var fromDay =  fromYyyy + '-' + mm + '-' + dd;
+    const chartUrl = `https://api.polygon.io/v2/aggs/ticker/${chartSymbol}/range/1/month/${fromDay}/${toDay}?adjusted=true&sort=asc&limit=120&apiKey=${polygonApiKey}`;
     const chartResponse = await fetch(chartUrl);
     const chartData = await chartResponse.json();
-    const chartPerYear = chartData["Monthly Time Series"]
-    const chartYearLabels = Object.keys(chartPerYear)
-    chartYearLabels.length = 13
-    const chartDataYear = Object.values(chartPerYear)
-    chartDataYear.length = 13
-    const chartDataYearSet = Object.values(chartDataYear).map(c => JSON.parse(c["4. close"])).toReversed();
+    const chartPerYear = chartData['results']
+    const chartYearLabels = []
+    const chartYearPrices = []
+    for(let i = 0;i<chartPerYear.length;i++){
+        chartYearLabels.push(new Date(chartPerYear[i]['t']).toLocaleDateString());
+        chartYearPrices.push(chartPerYear[i]['c']);
+    }
+    // const chartYearLabels = Object.keys(chartPerYear)
+    // chartYearLabels.length = 13
+    // const chartDataYear = Object.values(chartPerYear)
+    // chartDataYear.length = 13
+    // const chartDataYearSet = Object.values(chartDataYear).map(c => JSON.parse(c["4. close"])).toReversed();
     symbolChart.data.datasets[0].label = 'Стоимость акции в течение года';
-    symbolChart.data.labels = chartYearLabels.toReversed();
-    symbolChart.data.datasets[0].data = chartDataYearSet;
+    symbolChart.data.labels = chartYearLabels;
+    symbolChart.data.datasets[0].data = chartYearPrices;
     symbolChart.update();
 }
 async function fetchNewsData(symbolId){
