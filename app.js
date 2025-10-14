@@ -1,4 +1,5 @@
 const avKey = 'JG5BTF4B8AXHCCKI';
+const finhubKey = 'd3iem19r01qn6oioapf0d3iem19r01qn6oioapfg'
 const newsKey = "203a3bbc12ff4ff18ffdfce847b6f27a";
 const ninjaApiKey = "D0oar+GVifLPv3Uso+w7bw==ZD2btbpinAr9WsCd";
 const polygonApiKey = "3KtCYpgimlWriDKLJa11M2WaYljpqxkP";
@@ -21,17 +22,16 @@ async function getStockSymbols(){
 
         const response  = await fetch(apiSpUrl,options)
         const data = await response.json();
-        data.length = 3
+        data.length = 5;
 
         for(let i = 0; i<data.length; i++){
             const apiPriceUrl = `https://api.polygon.io/v2/aggs/ticker/${data[i]["ticker"]}/prev?adjusted=true&apiKey=${polygonApiKey}`
             const priceResponse = await fetch(apiPriceUrl);
             const priceData = await priceResponse.json();
             const price = priceData["results"][0]
-            const apiChangeUrl =  `https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=${data[i]["ticker"]}&apikey=${avKey}`;
-            const changeResponse = await fetch(apiChangeUrl);
-            const changeData = await changeResponse.json();
-            const change = changeData["Global Quote"]
+            const finhubUrl =  `https://finnhub.io/api/v1/quote?symbol=${data[i]["ticker"]}&token=${finhubKey}`;
+            const finhubResponse = await fetch(finhubUrl);
+            const finhubData = await finhubResponse.json();
             tableContent.innerHTML += 
             `<div class="table__row" id="row" onclick="openDetails('${data[i]["ticker"]}')">
                     <div class="table__index" id="stockSymbol">
@@ -43,25 +43,13 @@ async function getStockSymbols(){
                     <div class="table__price">
                         `+price["c"]+ ` $
                     </div>
-                    <div class="table__pricediff">
-
+                    <div class="table__pricediff" style="color:${finhubData["d"]>=0? 'green': 'red'}">
+                        `+parseFloat(finhubData["d"]).toFixed(2)+`$` +parseFloat(finhubData["dp"]).toFixed(2)+`%
                     </div>
                     <div class="table__volume">
                         `+shortNum(price["v"])+`
                     </div>
                 </div>`
-            var changeRow = document.getElementsByClassName('table__pricediff')
-            for(i = 0;i < changeRow.length; i++)
-            {
-                if(change["09. change"]>= 0)
-                {
-                    changeRow[i].style.color = 'green'
-                }
-                else
-                {
-                    changeRow[i].style.color = 'red'
-                }
-            }
         }
         
     }
@@ -69,41 +57,43 @@ getStockSymbols();
 async function searchSymbol() {
     const symbol = document.getElementById('search__symbol').value;
     tableContent.innerHTML = ''
-    const searchRequest = `https://www.alphavantage.co/query?function=SYMBOL_SEARCH&keywords=${symbol}&apikey=${avKey}`
+    const searchRequest = `https://finnhub.io/api/v1/search?q=${symbol}&exchange=US&token=${finhubKey}`
     const searhcResponse = await fetch(searchRequest);
     const searchData = await searhcResponse.json()
-    const search = searchData["bestMatches"]
+    const search = searchData["result"]
     if(search == ''){
         alert('По вашему запросу ничего не найдено')
     }
     for (let i = 0; i < search.length; i++) {
-        const searchSymbol = `https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=${search[i]["1. symbol"]}&apikey=${avKey}`;
+        const searchSymbol = `https://finnhub.io/api/v1/quote?symbol=${search[i]["symbol"]}&token=${finhubKey}`;
         const searchSymbolesponse = await fetch(searchSymbol);
         const searchSymbolData = await searchSymbolesponse.json();
-        const symbolData = searchSymbolData["Global Quote"];
-      
+        const volumeUrl = `https://api.polygon.io/v2/aggs/ticker/${search[i]["symbol"]}/prev?adjusted=true&apiKey=${polygonApiKey}`
+        const volumeResponse = await fetch(volumeUrl);
+        const volumeData = await volumeResponse.json();
+        const volume = volumeData['results'][0]
         tableContent.innerHTML += 
-        `<div class="table__row" id="row" onclick="openDetails('${search[i]["1. symbol"]}')">
+        `<div class="table__row" id="row" onclick="openDetails('${search[i]["symbol"]}')">
             <div class="table__index" id="stockSymbol">
-                `+search[i]["1. symbol"]+
+                `+search[i]["symbol"]+
             `</div>
             <div class="table__name">
-                `+search[i]["2. name"]+`
+                `+search[i]["description"]+`
             </div>
             <div class="table__price">
-                `+parseFloat(symbolData["05. price"]).toFixed(2)+` $
+                `+parseFloat(searchSymbolData["c"]).toFixed(2)+` $
             </div>
-            <div class="table__pricediff">
-                `+parseFloat(symbolData["09. change"]).toFixed(2)+` $`+` `+symbolData["10. change percent"]+
+            <div class="table__pricediff style="color:${finhubData["d"]>=0? 'green': 'red'}">
+                `+parseFloat(searchSymbolData["d"]).toFixed(2)+` $`+` `+searchSymbolData["dp"]+
             `</div>
             <div class="table__volume" id="stockVolume">
-                `+shortNum(symbolData["06. volume"])+
+                `+shortNum(volume["v"])+
             `</div>
         </div`
         var change = document.getElementsByClassName('table__pricediff')
         for(i = 0;i < change.length; i++)
         {
-            if(symbolData["09. change"]>= 0)
+            if(searchSymbolData["d"]>= 0)
             {
                 change[i].style.color = 'green'
             }
