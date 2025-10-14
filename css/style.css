@@ -211,6 +211,11 @@ body
 {
     border: 1px solid black
 }
+#chartError
+{
+    color: rgba(252, 101, 101, 0.75);
+    text-align: center;
+}
 #newsWrapper
 {
     display: flex;

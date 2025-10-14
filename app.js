@@ -44,7 +44,7 @@ async function getStockSymbols(){
                         `+price["c"]+ ` $
                     </div>
                     <div class="table__pricediff" style="color:${finhubData["d"]>=0? 'green': 'red'}">
-                        `+parseFloat(finhubData["d"]).toFixed(2)+`$` +parseFloat(finhubData["dp"]).toFixed(2)+`%
+                        `+parseFloat(finhubData["d"]).toFixed(2)+`$  ` +parseFloat(finhubData["dp"]).toFixed(2)+`%
                     </div>
                     <div class="table__volume">
                         `+shortNum(price["v"])+`
@@ -61,7 +61,7 @@ async function searchSymbol() {
     const searhcResponse = await fetch(searchRequest);
     const searchData = await searhcResponse.json()
     const search = searchData["result"]
-    if(search == ''){
+    if(!search){
         alert('По вашему запросу ничего не найдено')
     }
     for (let i = 0; i < search.length; i++) {
@@ -147,32 +147,29 @@ async function stockChartDay() {
     var yyyy = today.getFullYear();
     var toDay = yyyy + '-' + mm + '-' + toDd;
     var fromDay =  yyyy + '-' + mm + '-' + fromDd;
-    const chartUrl = `https://api.polygon.io/v2/aggs/ticker/${chartSymbol}/range/30/minute/${fromDay}/${toDay}?adjusted=true&sort=asc&limit=120&apiKey=${polygonApiKey}`;
-    const chartResponse = await fetch(chartUrl);
-    const chartData = await chartResponse.json();
-    const chartPerDay = chartData['results'];
-    const chartDayLabels = []
-    const chartDayPrices = []
-    for(let i = 0;i<chartPerDay.length;i++){
-        chartDayLabels.push(new Date(chartPerDay[i]['t']).toLocaleTimeString());
-        chartDayPrices.push(chartPerDay[i]['c']);
+    var chartError = document.getElementById('chartError')
+    try{
+        const chartUrl = `https://api.polygon.io/v2/aggs/ticker/${chartSymbol}/range/30/minute/${fromDay}/${toDay}?adjusted=true&sort=asc&limit=120&apiKey=${polygonApiKey}`;
+        const chartResponse = await fetch(chartUrl);
+        const chartData = await chartResponse.json();
+        const chartPerDay = chartData['results'];
+        const chartDayLabels = []
+        const chartDayPrices = []
+        chartError.innerText = ''
+        
+        for(let i = 0;i<chartPerDay.length;i++){
+            chartDayLabels.push(new Date(chartPerDay[i]['t']).toLocaleTimeString());
+            chartDayPrices.push(chartPerDay[i]['c']);
+        }
+        symbolChart.data.datasets[0].label = 'Стоимость акции в течение дня';
+        symbolChart.data.labels = chartDayLabels;
+        symbolChart.data.datasets[0].data = chartDayPrices;
+        symbolChart.update();
     }
-
-    // const chartPerDay = chartData["Time Series (15min)"];
-    // const chartDayLabels = Object.keys(chartPerDay).toReversed();
-    // const filterDay = chartDayLabels.filter(function(elem){
-    //     if(elem.includes(today))
-    //         return elem
-    // });
-    // var filteredDayLabels = []
-    // for(i=0;i<filterDay.length;i++){
-    //     filteredDayLabels.push(chartPerDay[filterDay[i]])
-    // }
-    // alert(chartDayLabels)
-    symbolChart.data.datasets[0].label = 'Стоимость акции в течение дня';
-    symbolChart.data.labels = chartDayLabels;
-    symbolChart.data.datasets[0].data = chartDayPrices;
-    symbolChart.update();
+    catch(error){
+        console.error('Ошибка получения данных',error)
+        chartError.innerText = 'Данные графика пока недоступны, попробуйте через 1 минуту'
+    }
     
 }   
 
@@ -184,48 +181,29 @@ async function stockChartWeek() {
     var yyyy = today.getFullYear();
     var toDay = yyyy + '-' + mm + '-' + toDd;
     var fromDay =  yyyy + '-' + mm + '-' + fromDd;
+    var chartError = document.getElementById('chartError')
+    try{
     const chartUrl = `https://api.polygon.io/v2/aggs/ticker/${chartSymbol}/range/1/day/${fromDay}/${toDay}?adjusted=true&sort=asc&limit=120&apiKey=${polygonApiKey}`;
     const chartResponse = await fetch(chartUrl);
     const chartData = await chartResponse.json();
     const chartPerWeek = chartData['results']
     const chartWeekLabels = []
     const chartWeekPrices = []
-    for(let i = 0;i<chartPerWeek.length;i++){
-        chartWeekLabels.push(new Date(chartPerWeek[i]['t']).toLocaleDateString());
-        chartWeekPrices.push(chartPerWeek[i]['c']);
-    }
-    // var lastWeek = [];
-    // for(i = 0;i < 5;i++){
-    //     var weekDay = new Date()
-    //     var weekDd = String(weekDay.getDate()-i-1).padStart(2, '0');
-    //     var WeekMm = String(weekDay.getMonth() + 1).padStart(2, '0');
-    //         if(weekDd<1)
-    //         {
-    //             weekDd = String(30 + weekDay.getDate()-i-1).padStart(2, '0');
-    //             WeekMm = String(weekDay.getMonth()).padStart(2, '0');
-    //         } 
-    //     var weekYyyy = weekDay.getFullYear();
-    //     dayDate = weekYyyy + '-' + WeekMm + '-' + weekDd;
-    //     lastWeek[i] = dayDate;
-    //     }
-    //     //*даты последней недели
-
-    //  const chartWeekLabels = Object.keys(chartPerWeek);
+    chartError.innerText = ''
+        for(let i = 0;i<chartPerWeek.length;i++){
+            chartWeekLabels.push(new Date(chartPerWeek[i]['t']).toLocaleDateString());
+            chartWeekPrices.push(chartPerWeek[i]['c']);
+        }
         
-    //  let filteredWeek = [];
-    // for(i = 0; i<lastWeek.length;i++){
-    //     if(chartWeekLabels[i] = lastWeek[i]){
-    //          filteredWeek.push(chartPerWeek[lastWeek[i]])
-    //          if(filteredWeek[i] == undefined)
-    //              filteredWeek[i] = filteredWeek[i-1]
-    //     }
-    // }
-
-    // const chartDataWeekSet = Object.values(filteredWeek).map(c => JSON.parse(c["4. close"])).toReversed();
-    symbolChart.data.datasets[0].label = 'Стоимость акции в течение 5 дней';
-    symbolChart.data.labels = chartWeekLabels;
-    symbolChart.data.datasets[0].data = chartWeekPrices;
-    symbolChart.update();
+        symbolChart.data.datasets[0].label = 'Стоимость акции в течение 5 дней';
+        symbolChart.data.labels = chartWeekLabels;
+        symbolChart.data.datasets[0].data = chartWeekPrices;
+        symbolChart.update();
+    }
+    catch(error){
+        console.error('Ошибка получения данных',error)
+        chartError.innerText = 'Данные графика пока недоступны, попробуйте через 1 минуту'
+    }
 }
 
 async function stockChartMonth() {
@@ -236,25 +214,28 @@ async function stockChartMonth() {
     var yyyy = today.getFullYear();
     var toDay = yyyy + '-' + toMm + '-' + dd;
     var fromDay =  yyyy + '-' + fromMm + '-' + dd;
+    var chartError = document.getElementById('chartError')
+    try{
     const chartUrl = `https://api.polygon.io/v2/aggs/ticker/${chartSymbol}/range/1/day/${fromDay}/${toDay}?adjusted=true&sort=asc&limit=120&apiKey=${polygonApiKey}`;
     const chartResponse = await fetch(chartUrl);
     const chartData = await chartResponse.json();
     const chartPerMonth = chartData['results']
     const chartMonthLabels = []
     const chartMonthPrices = []
-    for(let i = 0;i<chartPerMonth.length;i++){
-        chartMonthLabels.push(new Date(chartPerMonth[i]['t']).toLocaleDateString());
-        chartMonthPrices.push(chartPerMonth[i]['c']);
+    chartError.innerText = ''
+        for(let i = 0;i<chartPerMonth.length;i++){
+            chartMonthLabels.push(new Date(chartPerMonth[i]['t']).toLocaleDateString());
+            chartMonthPrices.push(chartPerMonth[i]['c']);
+        }
+        symbolChart.data.datasets[0].label = 'Стоимость акции в течение 1 месяца';
+        symbolChart.data.labels = chartMonthLabels;
+        symbolChart.data.datasets[0].data = chartMonthPrices;
+        symbolChart.update();
     }
-    // const chartMonthLabels = Object.keys(chartPerMonth)
-    // chartMonthLabels.length = 22 
-    // const chartDataMonth = Object.values(chartPerMonth)
-    // chartDataMonth.length = 22 
-    // const chartDataMonthSet = chartDataMonth.map(c => JSON.parse(c["4. close"])).toReversed();
-    symbolChart.data.datasets[0].label = 'Стоимость акции в течение 1 месяца';
-    symbolChart.data.labels = chartMonthLabels;
-    symbolChart.data.datasets[0].data = chartMonthPrices;
-    symbolChart.update();
+    catch(error){
+        console.error('Ошибка получения данных',error)
+        chartError.innerText = 'Данные графика пока недоступны, попробуйте через 1 минуту'
+    }
 }
 
 async function stockChart3Months() {
@@ -265,25 +246,28 @@ async function stockChart3Months() {
     var yyyy = today.getFullYear();
     var toDay = yyyy + '-' + toMm + '-' + dd;
     var fromDay =  yyyy + '-' + fromMm + '-' + dd;
-    const chartUrl =  `https://api.polygon.io/v2/aggs/ticker/${chartSymbol}/range/1/week/${fromDay}/${toDay}?adjusted=true&sort=asc&limit=120&apiKey=${polygonApiKey}`;
-    const chartResponse = await fetch(chartUrl);
-    const chartData = await chartResponse.json();
-    const chartPer3Month = chartData['results']
-    const chart3MonthLabels = []
-    const chart3MonthPrices = []
-    for(let i = 0;i<chartPer3Month.length;i++){
-        chart3MonthLabels.push(new Date(chartPer3Month[i]['t']).toLocaleDateString());
-        chart3MonthPrices.push(chartPer3Month[i]['c']);
+    var chartError = document.getElementById('chartError')
+    try{
+        const chartUrl =  `https://api.polygon.io/v2/aggs/ticker/${chartSymbol}/range/1/week/${fromDay}/${toDay}?adjusted=true&sort=asc&limit=120&apiKey=${polygonApiKey}`;
+        const chartResponse = await fetch(chartUrl);
+        const chartData = await chartResponse.json();
+        const chartPer3Month = chartData['results']
+        const chart3MonthLabels = []
+        const chart3MonthPrices = []
+        chartError.innerText = ''
+        for(let i = 0;i<chartPer3Month.length;i++){
+            chart3MonthLabels.push(new Date(chartPer3Month[i]['t']).toLocaleDateString());
+            chart3MonthPrices.push(chartPer3Month[i]['c']);
+        }
+        symbolChart.data.datasets[0].label = 'Стоимость акции в течение 3 месяцев';
+        symbolChart.data.labels = chart3MonthLabels
+        symbolChart.data.datasets[0].data = chart3MonthPrices;
+        symbolChart.update();
     }
-    // const chart3MonthLabels = Object.keys(chartPer3Month)
-    // chart3MonthLabels.length = 14
-    // const chartData3Month = Object.values(chartPer3Month)
-    // chartData3Month.length = 14
-    // const chartData3MonthSet = Object.values(chartData3Month).map(c => JSON.parse(c["4. close"])).toReversed();
-    symbolChart.data.datasets[0].label = 'Стоимость акции в течение 3 месяцев';
-    symbolChart.data.labels = chart3MonthLabels
-    symbolChart.data.datasets[0].data = chart3MonthPrices;
-    symbolChart.update();
+    catch(error){
+        console.error('Ошибка получения данных',error)
+        chartError.innerText = 'Данные графика пока недоступны, попробуйте через 1 минуту'
+    }
 }
 
 async function stockChartYear() {
@@ -294,47 +278,75 @@ async function stockChartYear() {
     var toYyyy = today.getFullYear();
     var toDay = toYyyy + '-' + mm + '-' + dd;
     var fromDay =  fromYyyy + '-' + mm + '-' + dd;
-    const chartUrl = `https://api.polygon.io/v2/aggs/ticker/${chartSymbol}/range/1/month/${fromDay}/${toDay}?adjusted=true&sort=asc&limit=120&apiKey=${polygonApiKey}`;
-    const chartResponse = await fetch(chartUrl);
-    const chartData = await chartResponse.json();
-    const chartPerYear = chartData['results']
-    const chartYearLabels = []
-    const chartYearPrices = []
-    for(let i = 0;i<chartPerYear.length;i++){
-        chartYearLabels.push(new Date(chartPerYear[i]['t']).toLocaleDateString());
-        chartYearPrices.push(chartPerYear[i]['c']);
+    var chartError = document.getElementById('chartError')
+    try{
+        const chartUrl = `https://api.polygon.io/v2/aggs/ticker/${chartSymbol}/range/1/month/${fromDay}/${toDay}?adjusted=true&sort=asc&limit=5000&apiKey=${polygonApiKey}`;
+        const chartResponse = await fetch(chartUrl);
+        const chartData = await chartResponse.json();
+        const chartPerYear = chartData['results']
+        const chartYearLabels = []
+        const chartYearPrices = []
+        chartError.innerText = ''
+        for(let i = 0;i<chartPerYear.length;i++){
+            chartYearLabels.push(new Date(chartPerYear[i]['t']).toLocaleDateString());
+            chartYearPrices.push(chartPerYear[i]['c']);
+        }
+        symbolChart.data.datasets[0].label = 'Стоимость акции в течение года';
+        symbolChart.data.labels = chartYearLabels;
+        symbolChart.data.datasets[0].data = chartYearPrices;
+        symbolChart.update();
     }
-    // const chartYearLabels = Object.keys(chartPerYear)
-    // chartYearLabels.length = 13
-    // const chartDataYear = Object.values(chartPerYear)
-    // chartDataYear.length = 13
-    // const chartDataYearSet = Object.values(chartDataYear).map(c => JSON.parse(c["4. close"])).toReversed();
-    symbolChart.data.datasets[0].label = 'Стоимость акции в течение года';
-    symbolChart.data.labels = chartYearLabels;
-    symbolChart.data.datasets[0].data = chartYearPrices;
-    symbolChart.update();
+    catch(error){
+        console.error('Ошибка получения данных',error)
+        chartError.innerText = 'Данные графика пока недоступны, попробуйте через 1 минуту'
+    }
 }
-async function fetchNewsData(symbolId){
-    const keyword = symbolId;
-    const newsUrl = `https://newsapi.org/v2/everything?q=${keyword}&apiKey=${newsKey}&language=en&pageSize=10`;
+//Новости через NewsApi
+// async function fetchNewsData(symbolId){
+//     const keyword = symbolId;
+//     const newsUrl = `https://newsapi.org/v2/everything?q=${keyword}&apiKey=${newsKey}&language=en&pageSize=10`;
     
+//     const newsResponse = await fetch(newsUrl);
+//     const news = await newsResponse.json();
+//     const newsWrapper = document.getElementById("newsWrapper");
+//     let newsToWrap = '';
+//     for(let i = 0; i<10;i++)
+//     {
+//         newsToWrap += `<div class="news__card">
+//             <a href="`+ news.articles[i].url +`"><div class="news__card-title">` + news.articles[i].title + `</div></a>
+//             <div class="news__card-desc">${news.articles[i].description == null? 'Описание отсутствует' : news.articles[i].description}</div>
+//             <div class="news__card-date">`+ news.articles[i].publishedAt.slice(0,10) +`</div>
+//         </div>`
+//     }
+//     newsWrapper.innerHTML = newsToWrap;
+// }
+//Новости через Finnhub/comnpany-news
+async function fetchNewsData(symbolId){
+    var today = new Date();
+    var toDd = String(today.getDate()-1).padStart(2, '0');
+    var fromDd = String(today.getDate()-8).padStart(2, '0');
+    var mm = String(today.getMonth() + 1).padStart(2, '0');
+    var yyyy = today.getFullYear();
+    var toDay = yyyy + '-' + mm + '-' + toDd;
+    var fromDay =  yyyy + '-' + mm + '-' + fromDd;
+    const keyword = symbolId;
+    const newsUrl = `https://finnhub.io/api/v1/company-news?symbol=${keyword}&from=${fromDay}&to=${toDay}&token=${finhubKey}`;
     const newsResponse = await fetch(newsUrl);
     const news = await newsResponse.json();
+    news.length = 10;
     const newsWrapper = document.getElementById("newsWrapper");
     let newsToWrap = '';
-    for(let i = 0; i<10;i++)
+    for(let i = 0; i<news.length;i++)
     {
         newsToWrap += `<div class="news__card">
-            <a href="`+ news.articles[i].url +`"><div class="news__card-title">` + news.articles[i].title + `</div></a>
-            <div class="news__card-desc">${news.articles[i].description == null? 'Описание отсутствует' : news.articles[i].description}</div>
-            <div class="news__card-date">`+ news.articles[i].publishedAt.slice(0,10) +`</div>
+            <a href="`+ news[i]["url"] +`"><div class="news__card-title">` + news[i]["headline"] + `</div></a>
+            <div class="news__card-desc">${news[i]["summary"] == null? 'Описание отсутствует' : news[i]["summary"]}</div>
+             <div class="news__card-date">`+ new Date(news[i]["datetime"]).toLocaleTimeString() +`</div>
         </div>`
     }
     newsWrapper.innerHTML = newsToWrap;
 }
 var detailsElem = document.getElementById('details');//modal
-
-
 function openDetails(symbolId){
     detailsElem.style.animation = "slideIn 0.5s forwards";
     detailsElem.style.display = 'block';
