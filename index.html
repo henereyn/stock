@@ -6,9 +6,9 @@
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/normalize.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&display=swap" rel="stylesheet">
-    <title>Document</title>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&display=swap" rel="stylesheet">
+    <title>Stock Tracker</title>
 </head>
 <body>
     <header class="header">
@@ -62,6 +62,7 @@
             </div>
             <h1>Подробная статистика</h1>
             <div class="details__symbol" id="symbol"></div>
+            <div class="details__error" id="detailsError"></div>
             <div class="details__statistics">
                 <div>
                     <div class="details__statistics-price det__flex">
@@ -89,11 +90,11 @@
             <div>
                 <canvas id="myChart"></canvas>
                 <div class="chart__alter">
-                    <div class="chart__alter-button" id="chartDay" onclick="stockChartDay()">День</div>
-                    <div class="chart__alter-button" id="chartWeek" onclick="stockChartWeek()">Неделя</div>
-                    <div class="chart__alter-button" id="chartMonth" onclick="stockChartMonth()">Месяц</div>
-                    <div class="chart__alter-button" id="chartMonth" onclick="stockChart3Months()">3 Месяца</div>
-                    <div class="chart__alter-button" id="chartYear" onclick="stockChartYear()">Год</div>
+                    <div class="chart__alter-button" id="chartDay" onclick="stockChart(this.id)">День</div>
+                    <div class="chart__alter-button" id="chartWeek" onclick="stockChart(this.id)">Неделя</div>
+                    <div class="chart__alter-button" id="chartMonth" onclick="stockChart(this.id)">Месяц</div>
+                    <div class="chart__alter-button" id="chart3Month" onclick="stockChart(this.id)">3 Месяца</div>
+                    <div class="chart__alter-button" id="chartYear" onclick="stockChart(this.id)">Год</div>
                 </div>
                 <div id="chartError"></div>
             </div>
@@ -107,6 +108,5 @@
     </div>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="app.js"></script>
-    
 </body>
 </html>

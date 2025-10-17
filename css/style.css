@@ -1,5 +1,6 @@
 body
 {
+    overflow-x: hidden;
     background-color: rgb(190, 190, 190);
     font-family: "Ubuntu", sans-serif;
     font-style: normal;
@@ -102,19 +103,25 @@ body
         white-space: nowrap;
         text-overflow: ellipsis;
     }
+    .details{
+        width: 100% !important;
+    }
 }
 @media (max-width:500px){
     .main__table{
         font-size: 18px;
     }
     .details{
-        width: 90%;
+        width: 190%;
     }
     .table__volume
     {
         overflow: hidden;
         white-space: nowrap;
         text-overflow: ellipsis;
+    }
+    .details{
+        width: 100% !important;
     }
 }
 .table__row:hover
@@ -145,11 +152,11 @@ body
     top: 0;
     right: 0;
     width: 80%;
-    /* right: -80%; */
     transition: right 0.5s ease-out;
     height: auto;
     background: rgb(255, 255, 255);
     padding: 0 0 50px 0;
+    overflow: hidden;
 }
 @keyframes slideIn {
   0% {
@@ -165,7 +172,7 @@ body
     right: 0;
   }
   100% {
-    right: -80%;
+    right: -100%;
   }
 }
 .details__close
@@ -178,6 +185,11 @@ body
 .details__symbol
 {
     font-size: 32px;
+}
+.details__error
+{
+    font-size: 18px;
+    color: rgba(252, 101, 101, 0.75);
 }
 .details__statistics
 {
@@ -256,11 +268,11 @@ body
 {
     z-index: 1;
     display: none;
-    position: absolute;
+    position: fixed;
     top: 0;
     left: 0;
     width: 100%;
-    
     background: black;
     opacity: 0.3;
+    height: 100%;
 }
